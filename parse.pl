@@ -40,6 +40,7 @@ our %STYLES = (
 
 $parser->parse($_) while (<>);
 $parser->eof;
+cleanup_text();
 
 say Dumper(\@components);
 
@@ -150,6 +151,4 @@ sub end {
   current()->{text} .= "\n\n" if $tag eq "p" and !inside_ignore();
 
   pop @parents if track_tag($tag);
-
-  cleanup_text();
 }
