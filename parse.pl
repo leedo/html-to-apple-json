@@ -6,7 +6,7 @@ use warnings;
 
 use List::Util qw{any first};
 use HTML::Parser;
-use Data::Dump qw{pp};
+use Data::Dumper;
 
 my $parser = HTML::Parser->new(
   api_version => 3,
@@ -40,9 +40,8 @@ our %STYLES = (
 
 $parser->parse($_) while (<>);
 $parser->eof;
-cleanup_text();
 
-say pp \@components;
+say Dumper(\@components);
 
 sub cleanup_text {
   for (grep {$_->{text}} @components) {
@@ -151,4 +150,6 @@ sub end {
   current()->{text} .= "\n\n" if $tag eq "p" and !inside_ignore();
 
   pop @parents if track_tag($tag);
+
+  cleanup_text();
 }
