@@ -17,7 +17,7 @@ my $parser = HTML::Parser->new(
 
 my (@parents, @components);
 
-our @TRACK = qw{figure figcaption};
+our @TRACK = qw{figure figcaption p blockquote};
 our @IGNORE = qw{aside script style};
 our @CONCAT = qw{text};
 
@@ -25,6 +25,9 @@ our %TYPES = (
   p => "text",
   blockquote => "quote",
   img => "image",
+  h1 => "heading",
+  h2 => "heading",
+  h3 => "heading",
 );
 
 our %STYLES = (
@@ -49,7 +52,7 @@ sub cleanup_text {
 
 sub track_tag {
   my $tag = shift;
-  return any {$tag eq $_} @TRACK, @IGNORE, keys %STYLES, keys %TYPES;
+  return any {$tag eq $_} @TRACK, @IGNORE, keys %STYLES;
 }
 
 sub start_style {
@@ -136,7 +139,7 @@ sub text {
   return if inside_ignore();
   return if $text =~ /^\s*$/;
 
-  if (current()->{type} =~ /^text|quote$/) {
+  if (current()->{type} =~ /^text|quote|heading$/) {
     current()->{text} .= $text;
   }
 }
@@ -145,7 +148,7 @@ sub end {
   my $tag = shift;
 
   end_style($tag) if is_style($tag);
-  current()->{text} .= "\n\n" if $tag eq "p";
+  current()->{text} .= "\n\n" if $tag eq "p" and !inside_ignore();
 
   pop @parents if track_tag($tag);
 }
