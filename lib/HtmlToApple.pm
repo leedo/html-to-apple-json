@@ -10,6 +10,10 @@ use HTML::Parser;
 use JSON;
 
 use HtmlToApple::Component;
+use HtmlToApple::Component::Text;
+use HtmlToApple::Component::Quote;
+use HtmlToApple::Component::Image;
+use HtmlToApple::Component::Heading;
 
 has parser => (is => "lazy");
 has parents => (is => "rw", default => sub {[]});
@@ -84,7 +88,7 @@ sub new_component {
       && $self->current->type eq $type
       && $self->current->is_concat;
 
-  push @{$self->components}, HtmlToApple::Component::create($type, %args);
+  push @{$self->components}, "HtmlToApple::Component::$type"->new(%args);
 }
 
 sub inside_ignore {
@@ -103,7 +107,11 @@ sub is_style {
 sub start {
   my ($self, $tag, $attr) = @_;
 
+  # need to track even ignored tags, so we can know we're
+  # inside an ignorable part of the DOM
   push @{$self->parents}, $tag if $self->trackable_tag($tag);
+
+  # but we don't care about any styles, tags, etc inside the ignore
   return if $self->inside_ignore;
 
   # hack to allow p inside blockquote
