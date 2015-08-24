@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Moo;
-use List::Util qw{any first};
+use List::Util qw{any};
 use HTML::Parser;
 use JSON;
 
@@ -14,6 +14,7 @@ use HtmlToApple::Component::Text;
 use HtmlToApple::Component::Quote;
 use HtmlToApple::Component::Image;
 use HtmlToApple::Component::Heading;
+use HtmlToApple::Component::Caption;
 
 has parser => (is => "lazy");
 has parents => (is => "rw", default => sub {[]});
@@ -29,6 +30,7 @@ our %TYPES = (
   h1 => "Heading",
   h2 => "Heading",
   h3 => "Heading",
+  figcaption => "Caption",
 );
 
 our %STYLES = (

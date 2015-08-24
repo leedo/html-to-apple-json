@@ -1,4 +1,4 @@
-package HtmlToApple::Component::Heading;
+package HtmlToApple::Component::Caption;
 
 use v5.14;
 use strict;
@@ -8,6 +8,6 @@ use Moo;
 
 extends "HtmlToApple::Component::Text";
 
-sub type { "Heading" }
+sub type { "Caption" }
 
 1;
