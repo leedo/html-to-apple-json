@@ -45,7 +45,7 @@ sub paragraph {
   $self->add_text("\n\n");
 }
 
-sub cleanup_text {
+sub cleanup {
   my ($self) = @_;
 
   if ($self->text->[-1] and $self->text->[-1] eq "\n\n") {
@@ -56,6 +56,7 @@ sub cleanup_text {
 sub as_data {
   my ($self) = @_;
   return {
+    $self->attr_data,
     text => join("", @{$self->text}),
     styles => $self->styles,
     type => $self->type,

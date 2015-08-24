@@ -6,6 +6,9 @@ use warnings;
 
 use Moo;
 
+has attr => (is => "ro", default => sub {{}});
+
+sub allowed_attr { [] }
 sub can_style { return 0 }
 sub is_concat { return 0 }
 sub has_text  { return 0 }
@@ -15,12 +18,23 @@ sub has_text  { return 0 }
 
 sub type      { die "has no type" }
 sub add_style { die "can not style" }
-sub end_style { die "can not style" }
+sub end_style { die "can not style " . $_[0]->type }
 sub add_text  { die "can not add text" }
+sub cleanup   { }
+
+sub attr_data {
+  my $self = shift;
+  map {$_ => $self->attr->{$_}}
+    grep {defined $self->attr->{$_}}
+    @{$self->allowed_attr};
+}
 
 sub as_data {
   my ($self) = @_;
-  return { type => $self->type };
+  return {
+    $self->attr_data,
+    type => $self->type,
+  };
 }
 
 1;

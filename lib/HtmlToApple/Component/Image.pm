@@ -9,6 +9,7 @@ use List::Util qw{any first sum};
 
 extends "HtmlToApple::Component";
 
+sub allowed_attr { ["src", "width", "height"] }
 sub type { "Image" }
 
 1;

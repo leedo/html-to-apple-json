@@ -53,7 +53,7 @@ sub run {
   my ($self) = @_;
   open(my $fh, "<:utf8", $ARGV[0]) || die;
   $self->parser->parse_file($fh);
-  $_->cleanup_text for @{$self->components};
+  $_->cleanup for @{$self->components};
   print JSON->new->utf8->pretty->encode([map {$_->as_data} @{$self->components}]);
 }
 
@@ -69,26 +69,26 @@ sub current {
 
 sub start_style {
   my ($self, $tag, %attr) = @_;
-  if (my $style = $STYLES{$tag}) {
+  if ((my $style = $STYLES{$tag}) && $self->current->can_style ) {
     $self->current->add_style($style, %attr);
   }
 }
 
 sub end_style {
   my ($self, $tag) = @_;
-  if (my $style = $STYLES{$tag}) {
+  if ((my $style = $STYLES{$tag}) && $self->current->can_style) {
     $self->current->end_style($style);
   }
 }
 
 sub new_component {
-  my ($self, $type, %args) = @_;
+  my ($self, $type, $args) = @_;
 
   return if $self->current
       && $self->current->type eq $type
       && $self->current->is_concat;
 
-  push @{$self->components}, "HtmlToApple::Component::$type"->new(%args);
+  push @{$self->components}, "HtmlToApple::Component::$type"->new(attr => $args);
 }
 
 sub inside_ignore {
@@ -118,7 +118,7 @@ sub start {
   return if $tag eq "p" and any {$_ eq "blockquote"} @{$self->parents};
 
   if (my $type = $TYPES{$tag}) {
-    $self->new_component($type, %$attr);
+    $self->new_component($type, $attr);
   }
   elsif ($self->is_style($tag)) {
     $self->start_style($tag, %$attr);
