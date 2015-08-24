@@ -19,12 +19,12 @@ our @TRACK = qw{figure figcaption p blockquote};
 our @IGNORE = qw{aside script style};
 
 our %TYPES = (
-  p => "text",
-  blockquote => "quote",
-  img => "image",
-  h1 => "heading",
-  h2 => "heading",
-  h3 => "heading",
+  p => "Text",
+  blockquote => "Quote",
+  img => "Image",
+  h1 => "Heading",
+  h2 => "Heading",
+  h3 => "Heading",
 );
 
 our %STYLES = (
@@ -79,8 +79,12 @@ sub end_style {
 
 sub new_component {
   my ($self, $type, %args) = @_;
-  return if $self->current && $self->current->type eq $type && $self->current->is_concat;
-  push @{$self->components}, HtmlToApple::Component->new(type => $type, %args);
+
+  return if $self->current
+      && $self->current->type eq $type
+      && $self->current->is_concat;
+
+  push @{$self->components}, HtmlToApple::Component::create($type, %args);
 }
 
 sub inside_ignore {
@@ -118,7 +122,7 @@ sub text {
   return if $self->inside_ignore;
   return if $text =~ /^\s*$/;
 
-  if ($self->current->type =~ /^text|quote|heading$/) {
+  if ($self->current->has_text) {
     $self->current->add_text($text);
   }
 }
