@@ -51,11 +51,20 @@ sub _build_parser {
   );
 }
 
-sub run {
-  my ($self) = @_;
-  open(my $fh, "<:utf8", $ARGV[0]) || die;
-  $self->parser->parse_file($fh);
+sub parse {
+  my ($self, $chunk) = @_;
+  $self->parser->parse($chunk);
+}
+
+sub eof {
+  my ($self) = (@_);;
+  $self->parser->eof;
   $_->cleanup for @{$self->components};
+}
+
+sub dump {
+  my ($self) = @_;
+  $self->eof;
   print JSON->new->utf8->pretty->encode([map {$_->as_data} @{$self->components}]);
 }
 
