@@ -14,7 +14,7 @@ has styles => (is => "rw", default => sub {[]});
 
 sub can_style { return 1 }
 sub is_concat { return 1 }
-sub has_text  { return 1 }
+sub accepts_text { return 1 }
 
 sub type { "Text" }
 

@@ -11,7 +11,7 @@ has attr => (is => "ro", default => sub {{}});
 sub allowed_attr { [] }
 sub can_style { return 0 }
 sub is_concat { return 0 }
-sub has_text  { return 0 }
+sub accepts_text { return 0 }
 
 # this is a base class for other components
 # so we die if anything is not overridden

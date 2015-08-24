@@ -139,7 +139,7 @@ sub text_node {
   return if $self->inside_ignore;
   return if $text =~ /^\s*$/;
 
-  if ($self->current->has_text) {
+  if ($self->current->accepts_text) {
     $self->current->add_text($text);
   }
 }
