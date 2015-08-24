@@ -13,7 +13,7 @@ has text => (is => "ro", default => sub {[]});
 has styles => (is => "rw", default => sub {[]});
 
 sub can_style { return 1 }
-sub is_concat { return 1 }
+sub can_concat { return 1 }
 sub accepts_text { return 1 }
 
 sub type { "Text" }

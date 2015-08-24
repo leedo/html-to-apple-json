@@ -9,6 +9,7 @@ use List::Util qw{any};
 use HTML::Parser;
 
 use HtmlToApple::Component;
+use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Text;
 use HtmlToApple::Component::Quote;
 use HtmlToApple::Component::Image;
@@ -17,7 +18,7 @@ use HtmlToApple::Component::Caption;
 
 has parser => (is => "lazy");
 has parents => (is => "rw", default => sub {[]});
-has components => (is => "rw", default => sub {[]});
+has components => (is => "rw", default => sub {[HtmlToApple::Component::Empty->new]});
 
 our @IGNORE = qw{aside script style};
 
@@ -93,9 +94,8 @@ sub end_style {
 sub new_component {
   my ($self, $type, $args) = @_;
 
-  return if $self->current
-      && $self->current->type eq $type
-      && $self->current->is_concat;
+  return if $self->current->type eq $type
+      && $self->current->can_concat;
 
   push @{$self->components}, "HtmlToApple::Component::$type"->new(attr => $args);
 }
