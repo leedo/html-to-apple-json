@@ -68,7 +68,7 @@ sub dump {
 
 sub trackable_tag {
   my ($self, $tag) = @_;
-  return any {$tag eq $_} @IGNORE, keys %STYLES;
+  return any {$tag eq $_} @IGNORE, keys %STYLES, keys %TYPES;
 }
 
 sub current {
