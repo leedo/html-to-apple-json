@@ -10,7 +10,7 @@ use List::Util qw{any first sum};
 extends "HtmlToApple::Component";
 
 has text => (is => "ro", default => sub {[]});
-has styles => (is => "ro", default => sub {[]});
+has styles => (is => "rw", default => sub {[]});
 
 sub can_style { return 1 }
 sub is_concat { return 1 }
@@ -58,7 +58,7 @@ sub as_data {
   return {
     $self->attr_data,
     text => join("", @{$self->text}),
-    styles => $self->styles,
+    styles => [ grep {defined $_->[2]} @{$self->styles} ],
     type => $self->type,
   };
 }
