@@ -79,7 +79,7 @@ sub end_style {
 
 sub new_component {
   my ($self, $type, %args) = @_;
-  return if $self->current && $self->current->is_concat;
+  return if $self->current && $self->current->type eq $type && $self->current->is_concat;
   push @{$self->components}, HtmlToApple::Component->new(type => $type, %args);
 }
 
