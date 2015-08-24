@@ -7,7 +7,6 @@ use warnings;
 use Moo;
 use List::Util qw{any};
 use HTML::Parser;
-use JSON;
 
 use HtmlToApple::Component;
 use HtmlToApple::Component::Text;
@@ -65,7 +64,7 @@ sub eof {
 sub dump {
   my ($self) = @_;
   $self->eof;
-  print JSON->new->utf8->pretty->encode([map {$_->as_data} @{$self->components}]);
+  return [map {$_->as_data} @{$self->components}];
 }
 
 sub trackable_tag {
