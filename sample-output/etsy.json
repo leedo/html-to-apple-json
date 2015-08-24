@@ -1,7 +1,5 @@
 [
    {
-      "text" : "Turns out that messing around with legal (but questionable) Irish tax laws isn’t just for the big corporate types anymore: it even applies to hand-crafted, crunchy-granola online retailers like Etsy.\n\nIn a little-noticed change to the company’s Terms of Use that took effect last month, the online craft retailer has now restructured itself such that it now has an Irish subsidiary, Etsy Ireland, an unlimited liability corporation. The move allows Etsy to now take advantage of a tool that has become all-too-common among major tech companies, including Apple, Google, IBM, and others, as a way to both conceal financial disclosures and drastically reduce global tax obligations. (Bloomberg was the first to report on this change.)\n\nEtsy’s move is particularly eyebrow-raising given that it has a \"B Lab certification,\" under which it agrees to use business \"as a force for good,\" and \"be the change we seek in the world.\" That designation means while Etsy remains a for-profit company as organized under Delaware state law, it is supposed to adhere to certain self-imposed ethical principles.\n\nThe Brooklyn-based company declared that it is a \"mindful, transparent, and humane business\" in its investor prospectus (S-1) filing with the Securities and Exchange Corporation prior to going public earlier this year.\n\n\"Many people will tell you that Google shouldn't do it,\" Omri Marian, a tax law professor at the University of California, Irvine, told Ars by e-mail. \"So if Google shouldn't do it, a corporation that presents itself as supporting social sustainability definitely shouldn’t.\"",
-      "type" : "text",
       "styles" : [
          [
             "link",
@@ -35,14 +33,17 @@
                "href" : "https://www.sec.gov/Archives/edgar/data/1370637/000119312515077045/d806992ds1.htm"
             }
          ]
-      ]
+      ],
+      "type" : "Text",
+      "text" : "Turns out that messing around with legal (but questionable) Irish tax laws isn’t just for the big corporate types anymore: it even applies to hand-crafted, crunchy-granola online retailers like Etsy.\n\nIn a little-noticed change to the company’s Terms of Use that took effect last month, the online craft retailer has now restructured itself such that it now has an Irish subsidiary, Etsy Ireland, an unlimited liability corporation. The move allows Etsy to now take advantage of a tool that has become all-too-common among major tech companies, including Apple, Google, IBM, and others, as a way to both conceal financial disclosures and drastically reduce global tax obligations. (Bloomberg was the first to report on this change.)\n\nEtsy’s move is particularly eyebrow-raising given that it has a \"B Lab certification,\" under which it agrees to use business \"as a force for good,\" and \"be the change we seek in the world.\" That designation means while Etsy remains a for-profit company as organized under Delaware state law, it is supposed to adhere to certain self-imposed ethical principles.\n\nThe Brooklyn-based company declared that it is a \"mindful, transparent, and humane business\" in its investor prospectus (S-1) filing with the Securities and Exchange Corporation prior to going public earlier this year.\n\n\"Many people will tell you that Google shouldn't do it,\" Omri Marian, a tax law professor at the University of California, Irvine, told Ars by e-mail. \"So if Google shouldn't do it, a corporation that presents itself as supporting social sustainability definitely shouldn’t.\""
    },
    {
-      "text" : "Totally legal",
-      "type" : "heading",
-      "styles" : []
+      "type" : "Heading",
+      "styles" : [],
+      "text" : "Totally legal"
    },
    {
+      "text" : "So how financially advantageous are these corporate moves? Put it this way: Google’s overseas tax rate was 2.4 percent in 2009, the lowest of all American tech companies when measured by market capitalization. As Ars reported in October 2013, Google is now moving even more money through a shell corporation in Bermuda—reaching a total of €8.8 billion ($11.91 billion) in 2012, 25 percent more than it did in 2011. Still, Etsy is unlikely to save anywhere close to this scale: the company lost $42.9 million in the first half of 2015.\n\nPearse Trust, an Ireland-based corporate consultancy firm, even summarized the secrecy reasons this way:",
       "styles" : [
          [
             "link",
@@ -69,8 +70,7 @@
             }
          ]
       ],
-      "type" : "text",
-      "text" : "So how financially advantageous are these corporate moves? Put it this way: Google’s overseas tax rate was 2.4 percent in 2009, the lowest of all American tech companies when measured by market capitalization. As Ars reported in October 2013, Google is now moving even more money through a shell corporation in Bermuda—reaching a total of €8.8 billion ($11.91 billion) in 2012, 25 percent more than it did in 2011. Still, Etsy is unlikely to save anywhere close to this scale: the company lost $42.9 million in the first half of 2015.\n\nPearse Trust, an Ireland-based corporate consultancy firm, even summarized the secrecy reasons this way:"
+      "type" : "Text"
    },
    {
       "text" : "Many may be motivated to incorporate or convert to an unlimited company for confidentiality reasons. Although an unlimited company is obliged to file an annual return, it is, in certain circumstances, relieved of the obligation to file accompanying accounts. The state of the company’s financial affairs does not, therefore, become a matter of public record.",
@@ -82,10 +82,10 @@
             {}
          ]
       ],
-      "type" : "quote"
+      "type" : "Quote"
    },
    {
-      "text" : "Bloomberg first described the process of its money movements (known as the \"Double Irish\") in 2010. As we have also reported, here’s how the Double Irish works: a company sells or licenses its foreign rights to intellectual property developed in the United States to a subsidiary in a country with lower tax rates. The result? Foreign profits that come from that tech are now attributed to that offshore subsidiary rather than the American headquarters. The subsidiaries have to pay \"arm’s length\" prices for those rights, just like an outside company would, but in reality they often don’t.\n\nIn the future, Etsy could take advantage of a similar system, but does not at present. While Etsy has existed as a corporation since 2006, it wasn’t until this year that the company re-organized its global corporate structure to include Etsy Ireland. [UPDATE: Taylor Watson, an Etsy spokeswoman, e-mailed Ars to clarify: \"We do not employ a Double Irish structure.\"]\n\nIn its first quarterly earnings report since going public in April 2015, Etsy wrote in May:",
+      "type" : "Text",
       "styles" : [
          [
             "link",
@@ -118,15 +118,16 @@
             }
          ]
       ],
-      "type" : "text"
+      "text" : "Bloomberg first described the process of its money movements (known as the \"Double Irish\") in 2010. As we have also reported, here’s how the Double Irish works: a company sells or licenses its foreign rights to intellectual property developed in the United States to a subsidiary in a country with lower tax rates. The result? Foreign profits that come from that tech are now attributed to that offshore subsidiary rather than the American headquarters. The subsidiaries have to pay \"arm’s length\" prices for those rights, just like an outside company would, but in reality they often don’t.\n\nIn the future, Etsy could take advantage of a similar system, but does not at present. While Etsy has existed as a corporation since 2006, it wasn’t until this year that the company re-organized its global corporate structure to include Etsy Ireland. [UPDATE: Taylor Watson, an Etsy spokeswoman, e-mailed Ars to clarify: \"We do not employ a Double Irish structure.\"]\n\nIn its first quarterly earnings report since going public in April 2015, Etsy wrote in May:"
    },
    {
       "text" : "In January 2015, the Company implemented an updated global corporate structure to more closely align with its global operations and future expansion plans outside of the United States. The new structure changes how the Company uses its intellectual property and implements certain intercompany arrangements, which the Company believes may result in a reduction in its overall effective tax rate and other operational efficiencies. The revised structure resulted in the setup of a deferred tax liability in the amount of $67.8 million on the taxable gain created in the transaction. A deferred charge was recorded for the same amount representing the future income tax which will be amortized into income tax expense over five years. During the three months ended March 31, 2015, $6.1 million was recorded to income tax expense.",
-      "styles" : [],
-      "type" : "quote"
+      "type" : "Quote",
+      "styles" : []
    },
    {
       "text" : "Neil Buchanan, a tax law professor at George Washington University, gave Ars his assessment of the corporate-speak.\n\n\"Translation: We figured out a technically legal way to cut our tax bill, and it doesn't bother us that doing so reduces the ability of our government to fund programs that we otherwise claim to support,\" he wrote. \"We'll get back to you when we've figured out any other 'operational efficiencies' that we might exploit.\"",
+      "type" : "Text",
       "styles" : [
          [
             "link",
@@ -136,11 +137,10 @@
                "href" : "http://www.law.gwu.edu/Faculty/profile.aspx?id=11219"
             }
          ]
-      ],
-      "type" : "text"
+      ]
    },
    {
-      "type" : "heading",
+      "type" : "Heading",
       "styles" : [],
       "text" : "Etsy refuses to answer questions"
    },
@@ -172,6 +172,6 @@
             }
          ]
       ],
-      "type" : "text"
+      "type" : "Text"
    }
 ]
