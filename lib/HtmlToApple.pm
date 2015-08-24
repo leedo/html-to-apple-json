@@ -15,21 +15,22 @@ use HtmlToApple::Component::Quote;
 use HtmlToApple::Component::Image;
 use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Caption;
+use HtmlToApple::Component::Gallery;
 
 has parser => (is => "lazy");
 has parents => (is => "rw", default => sub {[]});
 has components => (is => "rw", default => sub {[HtmlToApple::Component::Empty->new]});
+has ignore => (is => "rw", default => sub {0});
 
 our @IGNORE = qw{aside script style};
 
 our %TYPES = (
-  p => "Text",
-  blockquote => "Quote",
-  img => "Image",
-  h1 => "Heading",
-  h2 => "Heading",
-  h3 => "Heading",
-  figcaption => "Caption",
+  "Text"    => [{tag => "p"}],
+  "Quote"   => [{tag => "blockquote"}],
+  "Image"   => [{tag => "img"}],
+  "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
+  "Caption" => [{tag => "figcaption"}],
+  "Gallery" => [{tag => "div", class=> "gallery"}],
 );
 
 our %STYLES = (
@@ -67,11 +68,6 @@ sub dump {
   return [map {$_->as_data} @{$self->components}];
 }
 
-sub trackable_tag {
-  my ($self, $tag) = @_;
-  return any {$tag eq $_} @IGNORE, keys %STYLES, keys %TYPES;
-}
-
 sub current {
   my ($self) = @_;
   return $self->components->[-1];
@@ -97,15 +93,15 @@ sub new_component {
   return if $self->current->type eq $type
       && $self->current->can_concat;
 
-  push @{$self->components}, "HtmlToApple::Component::$type"->new(attr => $args);
-}
+  # if last component is a placeholder, we're replacing it
+  pop @{$self->components} if $self->current->type eq "Empty";
 
-sub inside_ignore {
-  my ($self) = @_;
-  for my $tag (@{$self->parents}) {
-    return 1 if any {$tag eq $_} @IGNORE;
-  }
-  return 0;
+  my $component = "HtmlToApple::Component::$type"->new(attr => $args);
+  push @{$self->components}, $component;
+
+  # associate this component with the current tag, so we know when
+  # the component ends
+  $self->parents->[-1][1] = $component;
 }
 
 sub is_style {
@@ -113,20 +109,34 @@ sub is_style {
   return any {$_ eq $tag} keys %STYLES;
 }
 
+sub incr_ignore {
+  my ($self, $tag) = @_;
+  if (any {$_ eq $tag} @IGNORE) {
+    $self->ignore($self->ignore + 1);
+  }
+  return $self->ignore;
+}
+
+sub decr_ignore {
+  my ($self, $tag) = @_;
+  if (any {$_ eq $tag} @IGNORE) {
+    $self->ignore($self->ignore - 1);
+  }
+  return $self->ignore;
+}
+
 sub start_tag {
   my ($self, $tag, $attr) = @_;
+  return if $self->incr_ignore($tag);
 
-  # need to track even ignored tags, so we can know we're
-  # inside an ignorable part of the DOM
-  push @{$self->parents}, $tag if $self->trackable_tag($tag);
+  if ($self->current->eats_child($tag, $attr)) {
+    $self->current->start_child($tag, $attr);
+    return;
+  }
 
-  # but we don't care about any styles, tags, etc inside the ignore
-  return if $self->inside_ignore;
+  push @{$self->parents}, [$tag, undef];
 
-  # hack to allow p inside blockquote
-  return if $tag eq "p" and any {$_ eq "blockquote"} @{$self->parents};
-
-  if (my $type = $TYPES{$tag}) {
+  if (my $type = $self->match_type($tag, $attr)) {
     $self->new_component($type, $attr);
   }
   elsif ($self->is_style($tag)) {
@@ -134,9 +144,28 @@ sub start_tag {
   }
 }
 
+sub match_type {
+  my ($self, $tag, $attr) = @_;
+  my @classes = split /\s+/, ($attr->{class} || "");
+  for my $type (keys %TYPES) {
+    for my $test (@{$TYPES{$type}}) {
+      if (defined $test->{tag}) {
+        next unless $tag eq $test->{tag};
+      }
+
+      if (defined $test->{class}) {
+        next unless any {$test->{class} eq $_} @classes;
+      }
+
+      # passes all tests, so return this type
+      return $type;
+    }
+  }
+}
+
 sub text_node {
   my ($self, $text) = @_;
-  return if $self->inside_ignore;
+  return if $self->ignore;
   return if $text =~ /^\s*$/;
 
   if ($self->current->accepts_text) {
@@ -147,12 +176,19 @@ sub text_node {
 sub end_tag {
   my ($self, $tag) = @_;
 
-  if (!$self->inside_ignore) {
+  return if $self->decr_ignore($tag);
+
+  if (!$self->ignore) {
     $self->end_style($tag) if $self->is_style($tag);
-    $self->current->paragraph if $tag eq "p";
+    $self->current->end_child($tag);
   }
 
-  pop @{$self->parents} if $self->trackable_tag($tag);
+  my $closed = pop @{$self->parents};
+
+  # a component ended, put a placeholder on the end
+  if ($closed->[1] && !$closed->[1]->can_concat) {
+    push @{$self->components}, HtmlToApple::Component::Empty->new;
+  }
 }
 
 1;

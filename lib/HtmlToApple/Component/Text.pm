@@ -40,9 +40,11 @@ sub add_text {
   push @{$self->text}, $add;
 }
 
-sub paragraph {
-  my ($self) = @_;
-  $self->add_text("\n\n");
+sub end_child {
+  my ($self, $tag) = @_;
+  if ($tag eq "p") {
+    $self->add_text("\n\n");
+  }
 }
 
 sub cleanup {

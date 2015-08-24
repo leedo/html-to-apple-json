@@ -5,10 +5,14 @@ use strict;
 use warnings;
 
 use Moo;
-use List::Util qw{any first sum};
 
 extends "HtmlToApple::Component::Text";
 
 sub type { "Quote" }
+sub can_concat { 0 }
+sub eats_child {
+  my ($self, $tag, $attr) = @_;
+  return $tag eq "p";
+}
 
 1;

@@ -20,7 +20,11 @@ sub type      { die "has no type" }
 sub add_style { die "can not style" }
 sub end_style { die "can not style " . $_[0]->type }
 sub add_text  { die "can not add text" }
-sub cleanup   { }
+
+sub cleanup     { }
+sub eats_child  { return 0 }
+sub start_child { }
+sub end_child   { }
 
 sub attr_data {
   my $self = shift;
