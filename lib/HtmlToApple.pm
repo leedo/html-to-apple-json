@@ -19,7 +19,6 @@ has parser => (is => "lazy");
 has parents => (is => "rw", default => sub {[]});
 has components => (is => "rw", default => sub {[]});
 
-our @TRACK = qw{figure figcaption p blockquote};
 our @IGNORE = qw{aside script style};
 
 our %TYPES = (
@@ -44,9 +43,9 @@ sub _build_parser {
   my ($self) = @_;
   HTML::Parser->new(
     api_version => 3,
-    start_h => [sub { $self->start(@_) }, "tagname,attr"],
-    text_h  => [sub { $self->text(@_) },  "dtext"],
-    end_h   => [sub { $self->end(@_) },   "tagname"],
+    start_h => [sub { $self->start_tag(@_) }, "tagname,attr"],
+    text_h  => [sub { $self->text_node(@_) },  "dtext"],
+    end_h   => [sub { $self->end_tag(@_) },   "tagname"],
   );
 }
 
@@ -69,7 +68,7 @@ sub dump {
 
 sub trackable_tag {
   my ($self, $tag) = @_;
-  return any {$tag eq $_} @TRACK, @IGNORE, keys %STYLES;
+  return any {$tag eq $_} @IGNORE, keys %STYLES;
 }
 
 sub current {
@@ -114,7 +113,7 @@ sub is_style {
   return any {$_ eq $tag} keys %STYLES;
 }
 
-sub start {
+sub start_tag {
   my ($self, $tag, $attr) = @_;
 
   # need to track even ignored tags, so we can know we're
@@ -135,7 +134,7 @@ sub start {
   }
 }
 
-sub text {
+sub text_node {
   my ($self, $text) = @_;
   return if $self->inside_ignore;
   return if $text =~ /^\s*$/;
@@ -145,7 +144,7 @@ sub text {
   }
 }
 
-sub end {
+sub end_tag {
   my ($self, $tag) = @_;
 
   if (!$self->inside_ignore) {
