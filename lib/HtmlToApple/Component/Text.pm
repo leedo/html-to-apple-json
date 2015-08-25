@@ -13,7 +13,6 @@ has text => (is => "ro", default => sub {[]});
 has styles => (is => "rw", default => sub {[]});
 
 sub can_style { return 1 }
-sub can_concat { return 1 }
 sub accepts_text { return 1 }
 
 sub type { "Text" }
@@ -38,13 +37,6 @@ sub end_style {
 sub add_text {
   my ($self, $add) = @_;
   push @{$self->text}, $add;
-}
-
-sub end_child {
-  my ($self, $tag) = @_;
-  if ($tag eq "p") {
-    $self->add_text("\n\n");
-  }
 }
 
 sub cleanup {

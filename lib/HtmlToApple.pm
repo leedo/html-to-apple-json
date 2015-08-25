@@ -4,7 +4,6 @@ use v5.14;
 use strict;
 use warnings;
 
-use Moo;
 use List::Util qw{any};
 use HTML::Parser;
 
@@ -17,10 +16,17 @@ use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 
-has parser => (is => "lazy");
-has parents => (is => "rw", default => sub {[]});
-has components => (is => "rw", default => sub {[HtmlToApple::Component::Empty->new]});
-has ignore => (is => "rw", default => sub {0});
+sub new {
+  my ($class, %args) = @_;
+  my $self = bless {
+    parents => [],
+    components => [HtmlToApple::Component::Empty->new],
+    ignore => 0
+  }, $class;
+
+  $self->{parser} = $self->_build_parser;
+  return $self;
+}
 
 our @IGNORE = qw{aside script style};
 
@@ -51,6 +57,9 @@ sub _build_parser {
   );
 }
 
+sub parser { $_[0]->{parser} }
+sub components { $_[0]->{components} }
+
 sub parse {
   my ($self, $chunk) = @_;
   $self->parser->parse($chunk);
@@ -59,7 +68,6 @@ sub parse {
 sub eof {
   my ($self) = (@_);;
   $self->parser->eof;
-  $_->cleanup for @{$self->components};
 }
 
 sub dump {
@@ -90,18 +98,12 @@ sub end_style {
 sub new_component {
   my ($self, $type, $args) = @_;
 
-  return if $self->current->type eq $type
-      && $self->current->can_concat;
-
-  # if last component is a placeholder, we're replacing it
-  pop @{$self->components} if $self->current->type eq "Empty";
-
   my $component = "HtmlToApple::Component::$type"->new(attr => $args);
   push @{$self->components}, $component;
 
   # associate this component with the current tag, so we know when
   # the component ends
-  $self->parents->[-1][1] = $component;
+  $self->{parents}[-1][1] = $component;
 }
 
 sub is_style {
@@ -109,35 +111,28 @@ sub is_style {
   return any {$_ eq $tag} keys %STYLES;
 }
 
-sub incr_ignore {
+sub is_ignore {
   my ($self, $tag) = @_;
-  if (any {$_ eq $tag} @IGNORE) {
-    $self->ignore($self->ignore + 1);
-  }
-  return $self->ignore;
-}
-
-sub decr_ignore {
-  my ($self, $tag) = @_;
-  if (any {$_ eq $tag} @IGNORE) {
-    $self->ignore($self->ignore - 1);
-  }
-  return $self->ignore;
+  return any {$_ eq $tag} @IGNORE;
 }
 
 sub start_tag {
   my ($self, $tag, $attr) = @_;
-  return if $self->incr_ignore($tag);
 
-  if ($self->current->eats_child($tag, $attr)) {
-    $self->current->start_child($tag, $attr);
+  if ($self->is_ignore($tag)) {
+    $self->{ignore}++;
     return;
   }
 
-  push @{$self->parents}, [$tag, undef];
+  return if $self->{ignore};
 
-  if (my $type = $self->match_type($tag, $attr)) {
-    $self->new_component($type, $attr);
+  push @{$self->{parents}}, [$tag, undef];
+
+  if ($self->current->type eq "Empty") {
+    if (my $type = $self->match_type($tag, $attr)) {
+      pop @{$self->components} if $self->current->type eq "Empty";
+      $self->new_component($type, $attr);
+    }
   }
   elsif ($self->is_style($tag)) {
     $self->start_style($tag, %$attr);
@@ -165,7 +160,7 @@ sub match_type {
 
 sub text_node {
   my ($self, $text) = @_;
-  return if $self->ignore;
+  return if $self->{ignore};
   return if $text =~ /^\s*$/;
 
   if ($self->current->accepts_text) {
@@ -176,18 +171,19 @@ sub text_node {
 sub end_tag {
   my ($self, $tag) = @_;
 
-  return if $self->decr_ignore($tag);
-
-  if (!$self->ignore) {
-    $self->end_style($tag) if $self->is_style($tag);
-    $self->current->end_child($tag);
+  if ($self->is_ignore($tag)) {
+    $self->{ignore}--;
+    return;
   }
 
-  my $closed = pop @{$self->parents};
+  return if $self->{ignore};
 
-  # a component ended, put a placeholder on the end
-  if ($closed->[1] && !$closed->[1]->can_concat) {
-    push @{$self->components}, HtmlToApple::Component::Empty->new;
+  $self->end_style($tag) if $self->is_style($tag);
+
+  my $closed = pop @{$self->{parents}};
+
+  if ($closed->[1]) {
+    push @{$self->{components}}, HtmlToApple::Component::Empty->new;
   }
 }
 
