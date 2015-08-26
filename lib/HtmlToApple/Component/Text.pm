@@ -23,8 +23,8 @@ sub text_length {
 }
 
 sub add_style {
-  my ($self, $style, %attr) = @_;
-  push @{$self->styles}, [$style, $self->text_length, undef, \%attr];
+  my ($self, $style, $attr) = @_;
+  push @{$self->styles}, [$style, $self->text_length, undef, $attr];
 }
 
 sub end_style {
