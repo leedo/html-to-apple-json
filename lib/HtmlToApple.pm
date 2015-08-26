@@ -6,6 +6,7 @@ use warnings;
 
 use List::Util qw{any};
 use HTML::Parser;
+use Data::Dump qw{pp};
 
 use HtmlToApple::Component;
 use HtmlToApple::Component::Empty;
@@ -21,7 +22,7 @@ sub new {
   my $self = bless {
     parents => [],
     components => [HtmlToApple::Component::Empty->new],
-    ignore => 0
+    ignores => [],
   }, $class;
 
   $self->{parser} = $self->_build_parser;
@@ -36,7 +37,7 @@ our %TYPES = (
   "Image"   => [{tag => "img"}],
   "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
   "Caption" => [{tag => "figcaption"}],
-  "Gallery" => [{tag => "div", class=> "gallery"}],
+  "Gallery" => [{tag => "div", class => "gallery"}],
 );
 
 our %STYLES = (
@@ -81,61 +82,37 @@ sub current {
   return $self->components->[-1];
 }
 
-sub start_style {
-  my ($self, $tag, %attr) = @_;
-  if ((my $style = $STYLES{$tag}) && $self->current->can_style ) {
-    $self->current->add_style($style, %attr);
-  }
-}
-
-sub end_style {
-  my ($self, $tag) = @_;
-  if ((my $style = $STYLES{$tag}) && $self->current->can_style) {
-    $self->current->end_style($style);
-  }
-}
-
 sub new_component {
   my ($self, $type, $args) = @_;
 
-  my $component = "HtmlToApple::Component::$type"->new(attr => $args);
-  push @{$self->components}, $component;
-
-  # associate this component with the current tag, so we know when
-  # the component ends
-  $self->{parents}[-1][1] = $component;
-}
-
-sub is_style {
-  my ($self, $tag) = @_;
-  return any {$_ eq $tag} keys %STYLES;
+  return"HtmlToApple::Component::$type"->new(attr => $args);
 }
 
 sub is_ignore {
-  my ($self, $tag) = @_;
+  my ($self, $tag, $attr) = @_;
   return any {$_ eq $tag} @IGNORE;
 }
 
 sub start_tag {
   my ($self, $tag, $attr) = @_;
 
-  if ($self->is_ignore($tag)) {
-    $self->{ignore}++;
-    return;
-  }
-
-  return if $self->{ignore};
+  push @{$self->{ignores}}, $tag if $self->is_ignore($tag, $attr);
+  return if @{$self->{ignores}};
 
   push @{$self->{parents}}, [$tag, undef];
 
-  if ($self->current->type eq "Empty") {
-    if (my $type = $self->match_type($tag, $attr)) {
-      pop @{$self->components} if $self->current->type eq "Empty";
-      $self->new_component($type, $attr);
+  if ($self->current->open) {
+    if ($STYLES{$tag} && $self->current->can_style) {
+      $self->current->add_style($STYLES{$tag}, $attr);
+    }
+    else {
+      $self->current->start_tag($tag, $attr);
     }
   }
-  elsif ($self->is_style($tag)) {
-    $self->start_style($tag, %$attr);
+  elsif (my $type = $self->match_type($tag, $attr)) {
+    my $component = $self->new_component($type, $attr);
+    push @{$self->components}, $component;
+    $self->{parents}[-1][1] = $component;
   }
 }
 
@@ -160,7 +137,7 @@ sub match_type {
 
 sub text_node {
   my ($self, $text) = @_;
-  return if $self->{ignore};
+  return if @{$self->{ignores}};
   return if $text =~ /^\s*$/;
 
   if ($self->current->accepts_text) {
@@ -171,20 +148,21 @@ sub text_node {
 sub end_tag {
   my ($self, $tag) = @_;
 
-  if ($self->is_ignore($tag)) {
-    $self->{ignore}--;
+  if (@{$self->{ignores}} and $self->{ignores}[-1] eq $tag) {
+    pop @{$self->{ignores}};
     return;
   }
 
-  return if $self->{ignore};
+  return if @{$self->{ignores}};
 
-  $self->end_style($tag) if $self->is_style($tag);
+  if ($STYLES{$tag} and $self->current->can_style) {
+    $self->current->end_style($tag);
+  }
 
   my $closed = pop @{$self->{parents}};
 
-  if ($closed->[1]) {
-    push @{$self->{components}}, HtmlToApple::Component::Empty->new;
-  }
+  # close component with openeing tag
+  $closed->[1]->close if $closed->[1];
 }
 
 1;

@@ -7,6 +7,7 @@ use warnings;
 use Moo;
 
 has attr => (is => "ro", default => sub {{}});
+has open => (is => "rw", default => sub {1});
 
 sub allowed_attr { [] }
 sub can_style { return 0 }
@@ -20,10 +21,12 @@ sub add_style { die "can not style" }
 sub end_style { die "can not style " . $_[0]->type }
 sub add_text  { die "can not add text" }
 
-sub cleanup     { }
-sub eats_child  { return 0 }
-sub start_child { }
-sub end_child   { }
+sub start_tag { }
+
+sub close {
+  my $self = shift;
+  $self->open(0);
+}
 
 sub attr_data {
   my $self = shift;

@@ -13,16 +13,11 @@ has images => (is => "rw", default => sub {[]});
 
 sub type { "Gallery" }
 
-sub eats_child {
-  my ($self, $tag, $attr) = @_;
-  return any {$tag eq $_} qw{a img};
-}
-
-sub start_child {
+sub start_tag {
   my ($self, $tag, $attr) = @_;
 
-  if ($tag eq "a" and $attr->{class} ne "enlarge") {
-    push @{$self->images}, $attr;
+  if ($tag eq "a" and $attr->{"data-orig"}) {
+    push @{$self->images}, $attr->{"data-orig"};
   }
 }
 
