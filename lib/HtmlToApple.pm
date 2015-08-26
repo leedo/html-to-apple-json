@@ -8,7 +8,6 @@ use List::Util qw{any all};
 use HTML::Parser;
 use Data::Dump qw{pp};
 
-use HtmlToApple::Component;
 use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Text;
 use HtmlToApple::Component::Quote;
@@ -82,7 +81,7 @@ sub cleanup {
       }
     }
 
-    push @clean, $c->as_data;
+    push @clean, $c;
   }
 
   $self->{components} = [@clean];
@@ -92,7 +91,7 @@ sub dump {
   my ($self) = @_;
   $self->parser->eof;
   $self->cleanup;
-  return $self->components;
+  return [map {$_->as_data} @{$self->components}];
 }
 
 sub current {
@@ -102,7 +101,6 @@ sub current {
 
 sub new_component {
   my ($self, $type, $args) = @_;
-
   return"HtmlToApple::Component::$type"->new(attr => $args);
 }
 
