@@ -30,6 +30,7 @@
     </div>
     <div class="bot">
       <input type="submit" id="submit" value="Update JSON output">
+      <p><a href="https://github.com/leedo/html-to-apple-json">html-to-apple-json</a></p>
     </div>
   </body>
   <script src="https://code.jquery.com/jquery-2.1.4.js" type="text/javascript"></script>
