@@ -11,6 +11,7 @@ use HTML::Parser;
 use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Paragraph;
 use HtmlToApple::Component::Pullquote;
+use HtmlToApple::Component::Tweet;
 use HtmlToApple::Component::Quote;
 use HtmlToApple::Component::Image;
 use HtmlToApple::Component::Heading;
@@ -27,6 +28,7 @@ our @EMPTY = qw{img br hr meta link base embed param area col input};
 our %TYPES = (
   "Paragraph" => [{tag => "p"}],
   "Pullquote" => [{tag => "blockquote", class => "pullquote"}],
+  "Tweet" => [{tag => "blockquote", class => "twitter-tweet"}],
   "Quote"   => [{tag => "blockquote"}],
   "Image"   => [{tag => "img"}],
   "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
