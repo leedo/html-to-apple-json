@@ -1,4 +1,4 @@
-package HtmlToApple::Component::Quote;
+package HtmlToApple::Component::Pullquote;
 
 use v5.14;
 use strict;
@@ -8,6 +8,6 @@ use Moo;
 
 extends "HtmlToApple::Component::Text";
 
-sub type { "Quote" }
+sub type { "Pullquote" }
 
 1;

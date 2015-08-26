@@ -9,7 +9,8 @@ use HTML::Parser;
 
 # import types of components used in final document
 use HtmlToApple::Component::Empty;
-use HtmlToApple::Component::Text;
+use HtmlToApple::Component::Paragraph;
+use HtmlToApple::Component::Pullquote;
 use HtmlToApple::Component::Quote;
 use HtmlToApple::Component::Image;
 use HtmlToApple::Component::Heading;
@@ -24,7 +25,8 @@ our @EMPTY = qw{img br hr meta link base embed param area col input};
 
 # map component types to a simple "selector"
 our %TYPES = (
-  "Text"    => [{tag => "p"}],
+  "Paragraph" => [{tag => "p"}],
+  "Pullquote" => [{tag => "blockquote", class => "pullquote"}],
   "Quote"   => [{tag => "blockquote"}],
   "Image"   => [{tag => "img"}],
   "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
