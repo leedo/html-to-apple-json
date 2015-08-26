@@ -12,10 +12,23 @@ extends "HtmlToApple::Component";
 has text => (is => "ro", default => sub {[]});
 has styles => (is => "rw", default => sub {[]});
 
-sub can_style { return 1 }
-sub accepts_text { return 1 }
-
 sub type { "Text" }
+
+sub concat {
+  my ($self, $comp) = @_;
+  $self->add_text("\n\n");
+  my $l = $self->text_length;
+
+  for (@{$comp->text}) {
+    $self->add_text($_);
+  }
+
+  for (@{$comp->styles}) {
+    $_->[1] += $l;
+    $_->[2] += $l;
+    push @{$self->styles}, $_;
+  }
+}
 
 sub text_length {
   my ($self) = @_;
@@ -37,14 +50,6 @@ sub end_style {
 sub add_text {
   my ($self, $add) = @_;
   push @{$self->text}, $add;
-}
-
-sub cleanup {
-  my ($self) = @_;
-
-  if ($self->text->[-1] and $self->text->[-1] eq "\n\n") {
-    pop @{$self->text};
-  }
 }
 
 sub as_data {

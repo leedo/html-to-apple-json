@@ -10,18 +10,11 @@ has attr => (is => "ro", default => sub {{}});
 has open => (is => "rw", default => sub {1});
 
 sub allowed_attr { [] }
-sub can_style { return 0 }
-sub accepts_text { return 0 }
 
 # this is a base class for other components
 # so we die if anything is not overridden
 
-sub type      { die "has no type" }
-sub add_style { die "can not style" }
-sub end_style { die "can not style " . $_[0]->type }
-sub add_text  { die "can not add text" }
-
-sub start_tag { }
+sub type { die "has no type" }
 
 sub close {
   my $self = shift;

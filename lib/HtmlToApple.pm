@@ -66,15 +66,32 @@ sub parse {
   $self->parser->parse($chunk);
 }
 
-sub eof {
-  my ($self) = (@_);;
-  $self->parser->eof;
+sub cleanup {
+  my ($self) = @_;
+
+  my @clean;
+  my @comps = @{$self->components};
+
+  while (my $c = shift @comps) {
+    next if $c->type eq "Empty";
+
+    if ($c->can("concat")) {
+      while (@comps and $comps[0]->type eq $c->type) {
+        $c->concat(shift @comps);
+      }
+    }
+
+    push @clean, $c->as_data;
+  }
+
+  $self->{components} = [@clean];
 }
 
 sub dump {
   my ($self) = @_;
-  $self->eof;
-  return [map {$_->as_data} @{$self->components}];
+  $self->parser->eof;
+  $self->cleanup;
+  return $self->components;
 }
 
 sub current {
@@ -102,10 +119,10 @@ sub start_tag {
   push @{$self->{parents}}, [$tag, undef];
 
   if ($self->current->open) {
-    if ($STYLES{$tag} && $self->current->can_style) {
+    if ($STYLES{$tag} && $self->current->can("add_style")) {
       $self->current->add_style($STYLES{$tag}, $attr);
     }
-    else {
+    elsif ($self->current->can("start_tag")) {
       $self->current->start_tag($tag, $attr);
     }
   }
@@ -140,7 +157,7 @@ sub text_node {
   return if @{$self->{ignores}};
   return if $text =~ /^\s*$/;
 
-  if ($self->current->accepts_text) {
+  if ($self->current->can("add_text")) {
     $self->current->add_text($text);
   }
 }
@@ -155,7 +172,7 @@ sub end_tag {
 
   return if @{$self->{ignores}};
 
-  if ($STYLES{$tag} and $self->current->can_style) {
+  if ($STYLES{$tag} and $self->current->can("end_style")) {
     $self->current->end_style($tag);
   }
 
