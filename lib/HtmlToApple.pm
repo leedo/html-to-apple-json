@@ -6,8 +6,8 @@ use warnings;
 
 use List::Util qw{any all};
 use HTML::Parser;
-use Data::Dump qw{pp};
 
+# import types of components used in final document
 use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Text;
 use HtmlToApple::Component::Quote;
@@ -15,6 +15,32 @@ use HtmlToApple::Component::Image;
 use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
+
+# ignore these tags and their children
+our @IGNORE = qw{aside script style};
+
+# list of unclosed tags, don't look for matching close tag
+our @UNCLOSED = qw{img br hr meta link base embed param area col input};
+
+# map component types to a simple "selector"
+our %TYPES = (
+  "Text"    => [{tag => "p"}],
+  "Quote"   => [{tag => "blockquote"}],
+  "Image"   => [{tag => "img"}],
+  "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
+  "Caption" => [{tag => "figcaption"}],
+  "Gallery" => [{tag => "div", class => "gallery"}],
+);
+
+# map tag names to style
+our %STYLES = (
+  b => "bold",
+  strong => "bold",
+  em => "italic",
+  i => "italic",
+  a => "link",
+);
+
 
 sub new {
   my ($class, %args) = @_;
@@ -27,26 +53,6 @@ sub new {
   $self->{parser} = $self->_build_parser;
   return $self;
 }
-
-our @IGNORE = qw{aside script style};
-our @UNCLOSED = qw{img br hr};
-
-our %TYPES = (
-  "Text"    => [{tag => "p"}],
-  "Quote"   => [{tag => "blockquote"}],
-  "Image"   => [{tag => "img"}],
-  "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
-  "Caption" => [{tag => "figcaption"}],
-  "Gallery" => [{tag => "div", class => "gallery"}],
-);
-
-our %STYLES = (
-  b => "bold",
-  strong => "bold",
-  em => "italic",
-  i => "italic",
-  a => "link",
-);
 
 sub _build_parser {
   my ($self) = @_;
@@ -65,6 +71,9 @@ sub parse {
   my ($self, $chunk) = @_;
   $self->parser->parse($chunk);
 }
+
+# remove empty components, and joins
+# consective types that can concat
 
 sub cleanup {
   my ($self) = @_;
@@ -114,6 +123,9 @@ sub start_tag {
     push @{$self->{parents}}, [$tag, undef];
   }
 
+  # already inside an open component
+  # style or let it decide what to do with a child tag
+
   if ($self->current->open) {
     if ($STYLES{$tag} && $self->current->can("add_style")) {
       $self->current->add_style($STYLES{$tag}, $attr);
@@ -122,15 +134,25 @@ sub start_tag {
       $self->current->start_tag($tag, $attr);
     }
   }
+
+  # no open component, and this tag matches
+  # a selector for a new component
+
   elsif (my $type = $self->match_type($tag, $attr)) {
     my $component = $self->new_component($type, $attr);
     push @{$self->components}, $component;
+
+    # don't add to list of parents if this is an
+    # empty tag
 
     if (all {$tag ne $_} @UNCLOSED) {
       $self->{parents}[-1][1] = $component;
     }
   }
 }
+
+# go through selectors and try to find one
+# that matches the tag and/or attributes
 
 sub match_type {
   my ($self, $tag, $attr) = @_;
@@ -164,6 +186,7 @@ sub text_node {
 sub end_tag {
   my ($self, $tag) = @_;
 
+  # update ignore list, and abort if still ignoring
   if (@{$self->{ignores}} and $self->{ignores}[-1] eq $tag) {
     pop @{$self->{ignores}};
     return;
@@ -171,13 +194,14 @@ sub end_tag {
 
   return if @{$self->{ignores}};
 
+  # close style if one is open
   if ($STYLES{$tag} and $self->current->can("end_style")) {
     $self->current->end_style($STYLES{$tag});
   }
 
   my $closed = pop @{$self->{parents}};
 
-  # close component with openeing tag
+  # close component associated closing tag
   $closed->[1]->close if $closed->[1];
 }
 
