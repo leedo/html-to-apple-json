@@ -19,11 +19,11 @@ builder {
       my $h = HtmlToApple->new;
       $h->parser->parse(decode utf8 => $req->parameters->{content});
       my $json = JSON->new->utf8->pretty->encode($h->dump);
-      my $hash = sha1_hex($json);
+      my $hash = sha1_hex($req->parameters->{content});
+      $redis->set("apple-json-$hash", $req->parameters->{content});
+      my $res = encode_json({hash => $hash, data => $json});
 
-      $redis->set("apple-json-$hash", $json);
-
-      return [200, ["Content-Type", "text/plain; charset=utf-8"], [$json]];
+      return [200, ["Content-Type", "application/json; charset=utf-8"], [$res]];
     }
     else {
       my $content;
