@@ -20,7 +20,7 @@ use HtmlToApple::Component::Gallery;
 our @IGNORE = qw{aside script style};
 
 # list of unclosed tags, don't look for matching close tag
-our @UNCLOSED = qw{img br hr meta link base embed param area col input};
+our @EMPTY = qw{img br hr meta link base embed param area col input};
 
 # map component types to a simple "selector"
 our %TYPES = (
@@ -119,7 +119,7 @@ sub start_tag {
   push @{$self->{ignores}}, $tag if any {$_ eq $tag} @IGNORE;
   return if @{$self->{ignores}};
 
-  if (all {$tag ne $_} @UNCLOSED) {
+  if (all {$tag ne $_} @EMPTY) {
     push @{$self->{parents}}, [$tag, undef];
   }
 
@@ -145,7 +145,7 @@ sub start_tag {
     # don't add to list of parents if this is an
     # empty tag
 
-    if (all {$tag ne $_} @UNCLOSED) {
+    if (all {$tag ne $_} @EMPTY) {
       $self->{parents}[-1][1] = $component;
     }
   }
