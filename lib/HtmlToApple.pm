@@ -4,7 +4,7 @@ use v5.14;
 use strict;
 use warnings;
 
-use List::Util qw{any};
+use List::Util qw{any all};
 use HTML::Parser;
 use Data::Dump qw{pp};
 
@@ -30,6 +30,7 @@ sub new {
 }
 
 our @IGNORE = qw{aside script style};
+our @UNCLOSED = qw{img br hr};
 
 our %TYPES = (
   "Text"    => [{tag => "p"}],
@@ -105,18 +106,15 @@ sub new_component {
   return"HtmlToApple::Component::$type"->new(attr => $args);
 }
 
-sub is_ignore {
-  my ($self, $tag, $attr) = @_;
-  return any {$_ eq $tag} @IGNORE;
-}
-
 sub start_tag {
   my ($self, $tag, $attr) = @_;
 
-  push @{$self->{ignores}}, $tag if $self->is_ignore($tag, $attr);
+  push @{$self->{ignores}}, $tag if any {$_ eq $tag} @IGNORE;
   return if @{$self->{ignores}};
 
-  push @{$self->{parents}}, [$tag, undef];
+  if (all {$tag ne $_} @UNCLOSED) {
+    push @{$self->{parents}}, [$tag, undef];
+  }
 
   if ($self->current->open) {
     if ($STYLES{$tag} && $self->current->can("add_style")) {
@@ -129,7 +127,10 @@ sub start_tag {
   elsif (my $type = $self->match_type($tag, $attr)) {
     my $component = $self->new_component($type, $attr);
     push @{$self->components}, $component;
-    $self->{parents}[-1][1] = $component;
+
+    if (all {$tag ne $_} @UNCLOSED) {
+      $self->{parents}[-1][1] = $component;
+    }
   }
 }
 
