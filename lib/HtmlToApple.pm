@@ -172,7 +172,7 @@ sub end_tag {
   return if @{$self->{ignores}};
 
   if ($STYLES{$tag} and $self->current->can("end_style")) {
-    $self->current->end_style($tag);
+    $self->current->end_style($STYLES{$tag});
   }
 
   my $closed = pop @{$self->{parents}};
