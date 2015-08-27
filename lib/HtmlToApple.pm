@@ -99,6 +99,7 @@ sub cleanup {
 sub dump {
   my ($self) = @_;
   $self->{parser}->eof;
+  $self->{root}->delete_tree;
   $self->cleanup;
   return [map {$_->as_data} @{$self->components}];
 }
