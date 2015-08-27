@@ -3,9 +3,9 @@ package HtmlToApple;
 use strict;
 use warnings;
 
-use List::Util qw{any all};
 use HTML::Parser;
 use Tree::DAG_Node::XPath;
+use List::Util qw{any all};
 use Scalar::Util qw{refaddr};
 
 # import types of components used in final document
@@ -19,7 +19,7 @@ use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 
-# ignore these tags and their children
+# ignore these tags and their children (TODO: XPath?)
 our @IGNORE = qw{aside script style};
 
 # list of unclosed tags, don't look for matching close tag
