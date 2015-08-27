@@ -10,6 +10,8 @@ has attr => (is => "ro", default => sub {{}});
 has open => (is => "rw", default => sub {1});
 
 sub allowed_attr { [] }
+sub start_tag { }
+sub end_tag { }
 
 # this is a base class for other components
 # so we die if anything is not overridden

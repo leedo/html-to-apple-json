@@ -38,16 +38,6 @@ our @TYPES = (
   [Gallery   => '//div[@class="gallery"]'],
 );
 
-# map tag names to style
-our %STYLES = (
-  b => "bold",
-  strong => "bold",
-  em => "italic",
-  i => "italic",
-  a => "link",
-);
-
-
 sub new {
   my ($class, %args) = @_;
   my $self = bless {
@@ -71,12 +61,11 @@ sub _build_parser {
   );
 }
 
-sub parser { $_[0]->{parser} }
 sub components { $_[0]->{components} }
 
 sub parse {
   my ($self, $chunk) = @_;
-  $self->parser->parse($chunk);
+  $self->{parser}->parse($chunk);
 }
 
 # remove empty components, and joins
@@ -104,7 +93,7 @@ sub cleanup {
 
 sub dump {
   my ($self) = @_;
-  $self->parser->eof;
+  $self->{parser}->eof;
   $self->cleanup;
   return [map {$_->as_data} @{$self->components}];
 }
@@ -112,10 +101,6 @@ sub dump {
 sub current {
   my ($self) = @_;
   return $self->components->[-1];
-}
-
-sub new_component {
-  my ($self, $type, $args) = @_;
 }
 
 sub start_tag {
@@ -132,14 +117,9 @@ sub start_tag {
     attributes => $attr,
   });
 
-  # already inside an open component, style it or give it node
+  # already inside an open component, let it handle tag
   if ($self->current->open) {
-    if ($STYLES{$tag} && $self->current->can("add_style")) {
-      $self->current->add_style($STYLES{$tag}, $attr);
-    }
-    elsif ($self->current->can("start_tag")) {
-      $self->current->start_tag($node);
-    }
+    $self->current->start_tag($node);
   }
 
   # no open component, and this tag matches selector
@@ -189,13 +169,11 @@ sub end_tag {
 
   return if @{$self->{ignores}};
 
-  # close style if one is open
-  if ($STYLES{$tag} and $self->current->can("end_style")) {
-    $self->current->end_style($STYLES{$tag});
-  }
-
   if ($self->{tag}->attributes->{component}) {
     $self->{tag}->attributes->{component}->close;
+  }
+  else {
+    $self->current->end_tag($self->{tag});
   }
 
   $self->{tag} = $self->{tag}->unlink_from_mother;

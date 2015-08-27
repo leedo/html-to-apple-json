@@ -17,7 +17,7 @@ builder {
 
     if ($req->method eq "POST") {
       my $h = HtmlToApple->new;
-      $h->parser->parse(decode utf8 => $req->parameters->{content});
+      $h->parse(decode utf8 => $req->parameters->{content});
       my $json = JSON->new->pretty->encode($h->dump);
       my $hash = sha1_hex($req->parameters->{content});
       $redis->set("apple-json-$hash", $req->parameters->{content});
