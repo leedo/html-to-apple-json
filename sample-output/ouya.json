@@ -1,0 +1,30 @@
+[
+   {
+      "type" : "Image",
+      "src" : "http://cdn.arstechnica.net/wp-content/uploads/2013/06/Ouya3-640x426.jpg",
+      "width" : "640",
+      "height" : "426"
+   },
+   {
+      "styles" : [
+         [
+            "Link",
+            119,
+            136,
+            {
+               "href" : "http://arstechnica.com/gaming/2015/07/indie-devs-say-ouya-still-owes-thousands-in-unpaid-free-the-games-fund-earnings/"
+            }
+         ],
+         [
+            "Link",
+            1303,
+            1328,
+            {
+               "href" : "http://www.polygon.com/2015/7/28/9059341/free-the-game-fund-ouya-razer"
+            }
+         ]
+      ],
+      "text" : "Following its acquisition of Ouya earlier this week, a few members of the platform's independent development community began to complain that new owner Razer was exploiting a \"bankruptcy clause\" to get out of payments owed under Ouya's \"Free the Games\" promotion. Razer has now taken steps to squash that budding controversy, saying it will make an estimated $620,000 in payments to participants in the promotion as originally promised.\n\nAs originally envisioned, \"Free the Games\" sought to match Kickstarter funds raised for independent game projects, provided they met certain development milestones and maintained exclusivity to the Ouya platform for a number of months. Participating developers will now sign a new agreement with Razer that drops the exclusivity requirement in exchange for the developer providing matching free downloads on Razer's new Cortex TV platform. \"For example, if $10,000 is funded toward a $1 game, then 10,000 games at $1 would be given away at no cost to gamers on Cortex TV,\" Razer said in a statement.\n\n\"Razer has a real interest in supporting indie developers and furthering the expansion of Android gaming on TV,\" the statement continues. \"Moving forward with this plan will ensure that both interests are met, as openly, widely, and beneficially as possible.\"\n\nIn an interview with Polygon, Razer CEO Min-Liang Tan said he was unaware of Ouya's outstanding Free the Games debt until late last night in Taiwan, where he was traveling for a conference. Despite having no legal obligation to pay out that money, Tan told Polygon he thought it was important to support the developers behind Ouya. \"This is purely being done out of goodwill,\" he said. \"I think this is going to be great for the developers. I think they're going to be able to get the games done and gamers will get access to games for free. Then those games will spread through word of mouth.\"",
+      "type" : "Paragraph"
+   }
+]

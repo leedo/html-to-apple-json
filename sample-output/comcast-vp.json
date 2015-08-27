@@ -1,47 +1,64 @@
 [
    {
       "text" : "Why does Comcast Internet service have a 300GB monthly data cap?\n\nWhen asked that question today, Comcast's vice president of Internet services, Jason Livingood, said that he doesn't know, because setting the monthly data limit is a business decision, not one driven by technical necessity.\n\n\"Cable Cares,\" a parody account on Twitter, asked Livingood, \"Serious question, why are Comcast's caps set so low compared to the speeds they're being sold at? 100mbps can hit 300GB in 6hr~.\"\n\n\"No idea—I'm involved on the engineering side to manage the measurement systems but don't weigh in on the business policies,\" Livingood responded.",
-      "type" : "Text",
       "styles" : [
          [
-            "italic",
+            "Italic",
             0,
             33,
             {}
          ],
          [
-            "italic",
+            "Italic",
             60,
             64,
             {}
          ],
          [
-            "bold",
+            "Bold",
             353,
             370,
             {}
          ],
          [
-            "link",
+            "Link",
             611,
             630,
             {
                "href" : "https://twitter.com/jlivingood/status/632177747469725696"
             }
          ]
-      ]
+      ],
+      "type" : "Paragraph"
    },
    {
-      "width" : "640",
+      "type" : "Image",
       "height" : "579",
       "src" : "http://cdn.arstechnica.net/wp-content/uploads/2015/08/comcast-data-cap-640x579.png",
-      "type" : "Image"
+      "width" : "640"
    },
    {
-      "type" : "Text",
+      "text" : "Enlarge",
       "styles" : [
          [
-            "link",
+            "Link",
+            0,
+            7,
+            {
+               "href" : "http://cdn.arstechnica.net/wp-content/uploads/2015/08/comcast-data-cap.png",
+               "class" : "enlarge",
+               "data-height" : "856",
+               "data-width" : "946"
+            }
+         ]
+      ],
+      "type" : "Caption"
+   },
+   {
+      "type" : "Paragraph",
+      "styles" : [
+         [
+            "Link",
             450,
             461,
             {
@@ -49,7 +66,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             861,
             882,
             {
@@ -57,7 +74,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             1009,
             1021,
             {
@@ -65,7 +82,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             1125,
             1129,
             {
@@ -73,13 +90,13 @@
             }
          ],
          [
-            "bold",
+            "Bold",
             1257,
             1262,
             {}
          ],
          [
-            "link",
+            "Link",
             1309,
             1328,
             {
@@ -87,7 +104,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             1382,
             1411,
             {
@@ -95,7 +112,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             1450,
             1470,
             {
@@ -103,7 +120,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             1769,
             1792,
             {
@@ -111,7 +128,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             1925,
             1956,
             {
@@ -119,7 +136,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             2383,
             2409,
             {
@@ -127,7 +144,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             2647,
             2661,
             {
@@ -135,7 +152,7 @@
             }
          ],
          [
-            "link",
+            "Link",
             2762,
             2787,
             {
