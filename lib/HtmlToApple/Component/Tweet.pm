@@ -1,6 +1,5 @@
 package HtmlToApple::Component::Tweet;
 
-use v5.14;
 use strict;
 use warnings;
 

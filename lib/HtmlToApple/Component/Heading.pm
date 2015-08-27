@@ -1,6 +1,5 @@
 package HtmlToApple::Component::Heading;
 
-use v5.14;
 use strict;
 use warnings;
 

@@ -1,6 +1,5 @@
 package HtmlToApple::Component::Caption;
 
-use v5.14;
 use strict;
 use warnings;
 

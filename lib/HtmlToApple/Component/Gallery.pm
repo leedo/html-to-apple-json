@@ -1,11 +1,9 @@
 package HtmlToApple::Component::Gallery;
 
-use v5.14;
 use strict;
 use warnings;
 
 use Moo;
-use List::Util qw{any};
 
 extends "HtmlToApple::Component";
 

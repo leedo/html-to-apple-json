@@ -48,22 +48,6 @@ sub matches_style {
   }
 }
 
-sub concat {
-  my ($self, $comp) = @_;
-  $self->add_text("\n\n");
-  my $l = $self->text_length;
-
-  for (@{$comp->text}) {
-    $self->add_text($_);
-  }
-
-  for (@{$comp->styles}) {
-    $_->[1] += $l;
-    $_->[2] += $l;
-    push @{$self->styles}, $_;
-  }
-}
-
 sub text_length {
   my ($self) = @_;
   return sum 0, map {length $_} @{$self->text};
