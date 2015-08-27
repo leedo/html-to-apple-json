@@ -21,15 +21,10 @@ use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 
 # ignore anything that matches or falls under these
-our @IGNORE = (
-  'aside',
-  'script',
-  'style',
-);
+our @IGNORE = ('aside', 'script', 'style');
 
-@IGNORE = map {selector_to_xpath($_)} @IGNORE;
 
-# map component types to XPath selector
+# map component types to CSS selector
 our @TYPES = (
   [Paragraph => 'p'],
   [Pullquote => 'blockquote.pullquote'],
@@ -41,10 +36,12 @@ our @TYPES = (
   [Gallery   => 'div.gallery'],
 );
 
-$_->[1] = selector_to_xpath($_->[1]) for @TYPES;
-
 # empty tags, don't look for matching close tag
 our @EMPTY = qw{img br hr meta link base embed param area col input};
+
+# convert CSS selectors to XPath ahead of time
+@IGNORE = map {selector_to_xpath($_)} @IGNORE;
+$_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 sub new {
   my ($class, %args) = @_;
