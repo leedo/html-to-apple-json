@@ -28,14 +28,14 @@ our @EMPTY = qw{img br hr meta link base embed param area col input};
 
 # map component types to XPath selector
 our @TYPES = (
-  ["Paragraph" => "//p"],
-  ["Pullquote" => "//blockquote[class=pullquote]"],
-  ["Tweet"     => "//blockquote[class=twitter-tweet]"],
-  ["Quote"     => "//blockquote"],
-  ["Image"     => "//img"],
-  ["Heading"   => "//h1 | h2 | h3"],
-  ["Caption"   => "//figcaption"],
-  ["Gallery"   => "//div[class=gallery]"],
+  [Paragraph => '//p'],
+  [Pullquote => '//blockquote[@class="pullquote"]'],
+  [Tweet     => '//blockquote[@class="twitter-tweet"]'],
+  [Quote     => '//blockquote'],
+  [Image     => '//img'],
+  [Heading   => '//h1 | h2 | h3'],
+  [Caption   => '//figcaption'],
+  [Gallery   => '//div[@class="gallery"]'],
 );
 
 # map tag names to style
