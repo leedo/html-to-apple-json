@@ -5,6 +5,7 @@ use warnings;
 
 use HTML::Parser;
 use Tree::DAG_Node::XPath;
+use HTML::Selector::XPath qw{selector_to_xpath};
 use List::Util qw{any all};
 use Scalar::Util qw{refaddr};
 
@@ -21,22 +22,26 @@ use HtmlToApple::Component::Gallery;
 
 # ignore anything that matches or falls under these
 our @IGNORE = (
-  '//aside',
-  '//script',
-  '//style',
+  'aside',
+  'script',
+  'style',
 );
+
+@IGNORE = map {selector_to_xpath($_)} @IGNORE;
 
 # map component types to XPath selector
 our @TYPES = (
-  [Paragraph => '//p'],
-  [Pullquote => '//blockquote[@class="pullquote"]'],
-  [Tweet     => '//blockquote[@class="twitter-tweet"]'],
-  [Quote     => '//blockquote'],
-  [Image     => '//img'],
-  [Heading   => '//h1 | h2 | h3'],
-  [Caption   => '//figcaption'],
-  [Gallery   => '//div[@class="gallery"]'],
+  [Paragraph => 'p'],
+  [Pullquote => 'blockquote.pullquote'],
+  [Tweet     => 'blockquote.twitter-tweet'],
+  [Quote     => 'blockquote'],
+  [Image     => 'img'],
+  [Heading   => 'h1, h2, h3'],
+  [Caption   => 'figcaption'],
+  [Gallery   => 'div.gallery'],
 );
+
+$_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 # empty tags, don't look for matching close tag
 our @EMPTY = qw{img br hr meta link base embed param area col input};

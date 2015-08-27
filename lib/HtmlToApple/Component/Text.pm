@@ -3,6 +3,7 @@ package HtmlToApple::Component::Text;
 use Moo;
 use List::Util qw{any first sum};
 use Scalar::Util qw{refaddr};
+use HTML::Selector::XPath qw{selector_to_xpath};
 
 extends "HtmlToApple::Component";
 
@@ -10,11 +11,13 @@ has text => (is => "ro", default => sub {[]});
 has styles => (is => "rw", default => sub {[]});
 
 our @STYLES = (
-  [Bold => '//b | strong'],
-  [Italic => '//em | i'],
-  [Monospace => '//code'],
-  [Link => '//a[@href]']
+  [Bold => 'b, strong'],
+  [Italic => 'em, i'],
+  [Monospace => 'code'],
+  [Link => 'a[href]']
 );
+
+$_->[1] = selector_to_xpath($_->[1]) for @STYLES;
 
 sub type { "Text" }
 
