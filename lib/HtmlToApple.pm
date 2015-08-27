@@ -81,7 +81,6 @@ sub parse {
 
 # remove empty components, and joins
 # consective types that can concat
-
 sub cleanup {
   my ($self) = @_;
 
@@ -117,7 +116,6 @@ sub current {
 
 sub new_component {
   my ($self, $type, $args) = @_;
-  return"HtmlToApple::Component::$type"->new(attr => $args);
 }
 
 sub start_tag {
@@ -134,39 +132,32 @@ sub start_tag {
     attributes => $attr,
   });
 
-  # already inside an open component
-  # style or let it decide what to do with a child tag
-
+  # already inside an open component, style it or give it node
   if ($self->current->open) {
     if ($STYLES{$tag} && $self->current->can("add_style")) {
       $self->current->add_style($STYLES{$tag}, $attr);
     }
     elsif ($self->current->can("start_tag")) {
-      $self->current->start_tag($tag, $attr);
+      $self->current->start_tag($node);
     }
   }
 
-  # no open component, and this tag matches
-  # a selector for a new component
-
+  # no open component, and this tag matches selector
   elsif (my $type = $self->matches_type($node)) {
-    my $component = $self->new_component($type, $attr);
+    my $component = "HtmlToApple::Component::$type"->new(attr => $attr);
+
     push @{$self->components}, $component;
-
-    # don't add to list of parents if this is an
-    # empty tag
-
     $node->attributes->{component} = $component;
+
     $component->close if $empty;
   }
 
-  # make this current tag if it is not empty (e.g. <img/>)
+  # make this the current tag if it is not empty (e.g. <img/>)
   $self->{tag} = $node if !$empty;
 }
 
 # go through selectors and try to find one
-# that matches the tag and/or attributes
-
+# that matches the current node
 sub matches_type {
   my ($self, $node) = @_;
   for my $type (@TYPES) {

@@ -14,10 +14,10 @@ has images => (is => "rw", default => sub {[]});
 sub type { "Gallery" }
 
 sub start_tag {
-  my ($self, $tag, $attr) = @_;
+  my ($self, $node) = @_;
 
-  if ($tag eq "a" and $attr->{"data-orig"}) {
-    push @{$self->images}, $attr->{"data-orig"};
+  if ($node->name eq "a" and $node->attributes->{"data-orig"}) {
+    push @{$self->images}, $node->attributes->{"data-orig"};
   }
 }
 
