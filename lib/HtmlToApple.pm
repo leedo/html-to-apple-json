@@ -66,7 +66,8 @@ sub _build_parser {
 
 sub components { $_[0]->{components} }
 sub root { $_[0]->{root} }
-sub tag  { $_[0]->{tag} }
+sub tag { $_[0]->{tag} }
+sub current { $_[0]->components->[-1] }
 
 sub parse {
   my ($self, $chunk) = @_;
@@ -102,11 +103,6 @@ sub dump {
   $self->{root}->delete_tree;
   $self->cleanup;
   return [map {$_->as_data} @{$self->components}];
-}
-
-sub current {
-  my ($self) = @_;
-  return $self->components->[-1];
 }
 
 sub start_tag {
