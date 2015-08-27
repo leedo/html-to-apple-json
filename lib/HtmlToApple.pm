@@ -19,11 +19,12 @@ use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 
-# ignore these tags and their children (TODO: XPath?)
-our @IGNORE = qw{aside script style};
-
-# list of unclosed tags, don't look for matching close tag
-our @EMPTY = qw{img br hr meta link base embed param area col input};
+# ignore anything that matches or falls under these
+our @IGNORE = (
+  '//aside',
+  '//script',
+  '//style',
+);
 
 # map component types to XPath selector
 our @TYPES = (
@@ -36,6 +37,9 @@ our @TYPES = (
   [Caption   => '//figcaption'],
   [Gallery   => '//div[@class="gallery"]'],
 );
+
+# empty tags, don't look for matching close tag
+our @EMPTY = qw{img br hr meta link base embed param area col input};
 
 sub new {
   my ($class, %args) = @_;
@@ -61,6 +65,8 @@ sub _build_parser {
 }
 
 sub components { $_[0]->{components} }
+sub root { $_[0]->{root} }
+sub tag  { $_[0]->{tag} }
 
 sub parse {
   my ($self, $chunk) = @_;
@@ -105,16 +111,15 @@ sub current {
 sub start_tag {
   my ($self, $tag, $attr) = @_;
 
-  push @{$self->{ignores}}, $tag if any {$_ eq $tag} @IGNORE;
-  return if @{$self->{ignores}};
-
-  # is this an empty tag?
   my $empty = any {$tag eq $_} @EMPTY;
-
   my $node = $self->{tag}->new_daughter({
     name => $tag,
     attributes => $attr,
   });
+
+  $self->{tag} = $node unless $empty;
+
+  return if $self->inside_ignore;
 
   # already inside an open component, let it handle tag
   if ($self->current->open) {
@@ -130,26 +135,31 @@ sub start_tag {
 
     $component->close if $empty;
   }
-
-  # make this the current tag if it is not empty (e.g. <img/>)
-  $self->{tag} = $node if !$empty;
 }
 
-# go through selectors and try to find one
-# that matches the current node
 sub matches_type {
   my ($self, $node) = @_;
   for my $type (@TYPES) {
-    my @matches = $self->{root}->findnodes($type->[1]);
+    my @matches = $self->root->findnodes($type->[1]);
     if (any {refaddr($node) == refaddr($_)} @matches) {
       return $type->[0];
     }
   }
 }
 
+sub inside_ignore {
+  my ($self) = @_;
+  for my $ignore (@IGNORE) {
+    my @matches = $self->root->findnodes($ignore);
+    for my $ancestor ($self->tag->ancestors) {
+      return 1 if any {refaddr($ancestor) eq refaddr($_)} @matches;
+    }
+  }
+}
+
 sub text_node {
   my ($self, $text) = @_;
-  return if @{$self->{ignores}};
+  return if $self->inside_ignore;
   return if $text =~ /^\s*$/;
 
   if ($self->current->can("add_text")) {
@@ -160,22 +170,14 @@ sub text_node {
 sub end_tag {
   my ($self, $tag) = @_;
 
-  # update ignore list, and abort if still ignoring
-  if (@{$self->{ignores}} and $self->{ignores}[-1] eq $tag) {
-    pop @{$self->{ignores}};
-    return;
-  }
-
-  return if @{$self->{ignores}};
-
-  if ($self->{tag}->attributes->{component}) {
-    $self->{tag}->attributes->{component}->close;
+  if ($self->tag->attributes->{component}) {
+    $self->tag->attributes->{component}->close;
   }
   else {
-    $self->current->end_tag($self->{tag});
+    $self->current->end_tag($self->tag);
   }
 
-  $self->{tag} = $self->{tag}->unlink_from_mother;
+  $self->{tag} = $self->tag->unlink_from_mother;
 }
 
 1;
