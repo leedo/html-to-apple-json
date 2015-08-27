@@ -1,8 +1,5 @@
 package HtmlToApple::Component;
 
-use strict;
-use warnings;
-
 use Moo;
 
 has attr => (is => "ro", default => sub {{}});

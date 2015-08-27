@@ -1,8 +1,5 @@
 package HtmlToApple::Component::Paragraph;
 
-use strict;
-use warnings;
-
 use Moo;
 
 extends "HtmlToApple::Component::Text";
