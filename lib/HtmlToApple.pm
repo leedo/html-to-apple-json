@@ -25,15 +25,15 @@ our @IGNORE = qw{aside script style};
 our @EMPTY = qw{img br hr meta link base embed param area col input};
 
 # map component types to a simple "selector"
-our %TYPES = (
-  "Paragraph" => [{tag => "p"}],
-  "Pullquote" => [{tag => "blockquote", class => "pullquote"}],
-  "Tweet" => [{tag => "blockquote", class => "twitter-tweet"}],
-  "Quote"   => [{tag => "blockquote"}],
-  "Image"   => [{tag => "img"}],
-  "Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}],
-  "Caption" => [{tag => "figcaption"}],
-  "Gallery" => [{tag => "div", class => "gallery"}],
+our @TYPES = (
+  ["Paragraph" => [{tag => "p"}]],
+  ["Pullquote" => [{tag => "blockquote", class => "pullquote"}]],
+  ["Tweet"   => [{tag => "blockquote", class => "twitter-tweet"}]],
+  ["Quote"   => [{tag => "blockquote"}]],
+  ["Image"   => [{tag => "img"}]],
+  ["Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}]],
+  ["Caption" => [{tag => "figcaption"}]],
+  ["Gallery" => [{tag => "div", class => "gallery"}]],
 );
 
 # map tag names to style
@@ -161,8 +161,8 @@ sub start_tag {
 sub match_type {
   my ($self, $tag, $attr) = @_;
   my @classes = split /\s+/, ($attr->{class} || "");
-  for my $type (keys %TYPES) {
-    for my $test (@{$TYPES{$type}}) {
+  for my $type (@TYPES) {
+    for my $test (@{$type->[1]}) {
       if (defined $test->{tag}) {
         next unless $tag eq $test->{tag};
       }
@@ -172,7 +172,7 @@ sub match_type {
       }
 
       # passes all tests, so return this type
-      return $type;
+      return $type->[0];
     }
   }
 }
