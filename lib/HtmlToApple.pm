@@ -6,6 +6,8 @@ use warnings;
 
 use List::Util qw{any all};
 use HTML::Parser;
+use Tree::DAG_Node::XPath;
+use Scalar::Util qw{refaddr};
 
 # import types of components used in final document
 use HtmlToApple::Component::Empty;
@@ -24,16 +26,16 @@ our @IGNORE = qw{aside script style};
 # list of unclosed tags, don't look for matching close tag
 our @EMPTY = qw{img br hr meta link base embed param area col input};
 
-# map component types to a simple "selector"
+# map component types to XPath selector
 our @TYPES = (
-  ["Paragraph" => [{tag => "p"}]],
-  ["Pullquote" => [{tag => "blockquote", class => "pullquote"}]],
-  ["Tweet"   => [{tag => "blockquote", class => "twitter-tweet"}]],
-  ["Quote"   => [{tag => "blockquote"}]],
-  ["Image"   => [{tag => "img"}]],
-  ["Heading" => [{tag => "h1"}, {tag => "h2"}, {tag => "h3"}]],
-  ["Caption" => [{tag => "figcaption"}]],
-  ["Gallery" => [{tag => "div", class => "gallery"}]],
+  ["Paragraph" => "//p"],
+  ["Pullquote" => "//blockquote[class=pullquote]"],
+  ["Tweet"     => "//blockquote[class=twitter-tweet]"],
+  ["Quote"     => "//blockquote"],
+  ["Image"     => "//img"],
+  ["Heading"   => "//h1 | h2 | h3"],
+  ["Caption"   => "//figcaption"],
+  ["Gallery"   => "//div[class=gallery]"],
 );
 
 # map tag names to style
@@ -49,11 +51,12 @@ our %STYLES = (
 sub new {
   my ($class, %args) = @_;
   my $self = bless {
-    parents => [],
+    root => Tree::DAG_Node::XPath->new({name => "root"}),
     components => [HtmlToApple::Component::Empty->new],
     ignores => [],
   }, $class;
 
+  $self->{tag} = $self->{root};
   $self->{parser} = $self->_build_parser;
   return $self;
 }
@@ -123,9 +126,13 @@ sub start_tag {
   push @{$self->{ignores}}, $tag if any {$_ eq $tag} @IGNORE;
   return if @{$self->{ignores}};
 
-  if (all {$tag ne $_} @EMPTY) {
-    push @{$self->{parents}}, [$tag, undef];
-  }
+  # is this an empty tag?
+  my $empty = any {$tag eq $_} @EMPTY;
+
+  my $node = $self->{tag}->new_daughter({
+    name => $tag,
+    attributes => $attr,
+  });
 
   # already inside an open component
   # style or let it decide what to do with a child tag
@@ -142,36 +149,29 @@ sub start_tag {
   # no open component, and this tag matches
   # a selector for a new component
 
-  elsif (my $type = $self->match_type($tag, $attr)) {
+  elsif (my $type = $self->matches_type($node)) {
     my $component = $self->new_component($type, $attr);
     push @{$self->components}, $component;
 
     # don't add to list of parents if this is an
     # empty tag
 
-    if (all {$tag ne $_} @EMPTY) {
-      $self->{parents}[-1][1] = $component;
-    }
+    $node->attributes->{component} = $component;
+    $component->close if $empty;
   }
+
+  # make this current tag if it is not empty (e.g. <img/>)
+  $self->{tag} = $node if !$empty;
 }
 
 # go through selectors and try to find one
 # that matches the tag and/or attributes
 
-sub match_type {
-  my ($self, $tag, $attr) = @_;
-  my @classes = split /\s+/, ($attr->{class} || "");
+sub matches_type {
+  my ($self, $node) = @_;
   for my $type (@TYPES) {
-    for my $test (@{$type->[1]}) {
-      if (defined $test->{tag}) {
-        next unless $tag eq $test->{tag};
-      }
-
-      if (defined $test->{class}) {
-        next unless any {$test->{class} eq $_} @classes;
-      }
-
-      # passes all tests, so return this type
+    my @matches = $self->{root}->findnodes($type->[1]);
+    if (any {refaddr($node) == refaddr($_)} @matches) {
       return $type->[0];
     }
   }
@@ -203,10 +203,11 @@ sub end_tag {
     $self->current->end_style($STYLES{$tag});
   }
 
-  my $closed = pop @{$self->{parents}};
+  if ($self->{tag}->attributes->{component}) {
+    $self->{tag}->attributes->{component}->close;
+  }
 
-  # close component associated closing tag
-  $closed->[1]->close if $closed->[1];
+  $self->{tag} = $self->{tag}->mother;
 }
 
 1;
