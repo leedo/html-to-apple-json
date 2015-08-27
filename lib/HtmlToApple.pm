@@ -207,7 +207,7 @@ sub end_tag {
     $self->{tag}->attributes->{component}->close;
   }
 
-  $self->{tag} = $self->{tag}->mother;
+  $self->{tag} = $self->{tag}->unlink_from_mother;
 }
 
 1;
