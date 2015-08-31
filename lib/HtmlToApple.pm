@@ -167,6 +167,11 @@ sub text_node {
 sub end_tag {
   my ($self, $tag) = @_;
 
+  if ($tag ne $self->tag->name) {
+    warn "closing unmatched tag $tag";
+    return;
+  }
+
   if ($self->tag->attributes->{component}) {
     $self->tag->attributes->{component}->close;
   }
