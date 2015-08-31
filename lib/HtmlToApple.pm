@@ -23,7 +23,6 @@ use HtmlToApple::Component::Gallery;
 # ignore anything that matches or falls under these
 our @IGNORE = ('aside', 'script', 'style');
 
-
 # map component types to CSS selector
 our @TYPES = (
   [Paragraph => 'p'],
@@ -48,7 +47,6 @@ sub new {
   my $self = bless {
     root => Tree::DAG_Node::XPath->new({name => "root"}),
     components => [HtmlToApple::Component::Empty->new],
-    ignores => [],
   }, $class;
 
   $self->{tag} = $self->{root};
