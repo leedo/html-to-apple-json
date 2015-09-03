@@ -39,24 +39,26 @@ $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 sub new {
   my ($class, %args) = @_;
-  my $self = bless {
-    root => HtmlToApple::Tag->new({name => "root"}),
+  my $root = HtmlToApple::Tag->new({name => "root"});
+
+  return bless {
+    root => $root,
+    tag => $root,
     components => [HtmlToApple::Component::Empty->new],
   }, $class;
-
-  $self->{tag} = $self->{root};
-  $self->{parser} = $self->_build_parser;
-  return $self;
 }
 
-sub _build_parser {
+sub parser {
   my ($self) = @_;
-  HTML::Parser->new(
-    api_version => 3,
-    start_h => [sub { $self->start_tag(@_) }, "tagname,attr,text"],
-    text_h  => [sub { $self->text_node(@_) },  "dtext"],
-    end_h   => [sub { $self->end_tag(@_) },   "tagname,text"],
-  );
+  if (!defined $self->{parser}) {
+    $self->{parser} = HTML::Parser->new(
+      api_version => 3,
+      start_h => [sub { $self->start_tag(@_) }, "tagname,attr,text"],
+      text_h  => [sub { $self->text_node(@_) },  "dtext"],
+      end_h   => [sub { $self->end_tag(@_) },   "tagname,text"],
+    );
+  }
+  return $self->{parser};
 }
 
 sub components { $_[0]->{components} }
@@ -66,7 +68,7 @@ sub current { $_[0]->components->[-1] }
 
 sub parse {
   my ($self, $chunk) = @_;
-  $self->{parser}->parse($chunk);
+  $self->parser->parse($chunk);
 }
 
 sub cleanup {
@@ -102,7 +104,7 @@ sub cleanup {
 
 sub dump {
   my ($self) = @_;
-  $self->{parser}->eof;
+  $self->parser->eof;
   $self->{root}->delete_tree;
   $self->cleanup;
   return [map {$_->as_data} @{$self->components}];
