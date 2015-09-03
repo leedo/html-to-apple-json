@@ -135,8 +135,8 @@ sub start_tag {
     }
   }
 
-  # manually end the tag if it is an empty tag (e.g. img)
-  $self->end_tag($name, $raw) if $tag->empty;
+  # manually end the tag if it is an "empty tag" (e.g. img)
+  $self->end_tag($name, "") if $tag->empty;
 }
 
 sub matches_type {
@@ -164,10 +164,10 @@ sub text_node {
 }
 
 sub end_tag {
-  my ($self, $tag, $raw) = @_;
+  my ($self, $name, $raw) = @_;
 
-  if ($tag ne $self->tag->name) {
-    warn "closing unmatched tag $tag";
+  if ($name ne $self->tag->name) {
+    warn "closing unmatched tag $name";
     return;
   }
 
