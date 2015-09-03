@@ -11,12 +11,10 @@ use Scalar::Util qw{refaddr};
 
 # import types of components used in final document
 use HtmlToApple::Component::Empty;
-use HtmlToApple::Component::Paragraph;
+use HtmlToApple::Component::Body;
 use HtmlToApple::Component::Pullquote;
 use HtmlToApple::Component::Tweet;
-use HtmlToApple::Component::Quote;
 use HtmlToApple::Component::Image;
-use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 
@@ -25,12 +23,10 @@ our @IGNORE = ('aside', 'script', 'style');
 
 # map component types to CSS selector
 our @TYPES = (
-  [Paragraph => 'p'],
+  [Body      => 'p, ol, ul, blockquote, h1, h2, h3, h4'],
   [Pullquote => 'blockquote.pullquote'],
   [Tweet     => 'blockquote.twitter-tweet'],
-  [Quote     => 'blockquote'],
   [Image     => 'img'],
-  [Heading   => 'h1, h2, h3'],
   [Caption   => 'figcaption'],
   [Gallery   => 'div.gallery'],
 );
@@ -58,9 +54,9 @@ sub _build_parser {
   my ($self) = @_;
   HTML::Parser->new(
     api_version => 3,
-    start_h => [sub { $self->start_tag(@_) }, "tagname,attr"],
+    start_h => [sub { $self->start_tag(@_) }, "tagname,attr,text"],
     text_h  => [sub { $self->text_node(@_) },  "dtext"],
-    end_h   => [sub { $self->end_tag(@_) },   "tagname"],
+    end_h   => [sub { $self->end_tag(@_) },   "tagname,text"],
   );
 }
 
@@ -106,7 +102,7 @@ sub dump {
 }
 
 sub start_tag {
-  my ($self, $tag, $attr) = @_;
+  my ($self, $tag, $attr, $raw) = @_;
 
   my $empty = any {$tag eq $_} @EMPTY;
   my $node = $self->{tag}->new_daughter({
@@ -118,17 +114,16 @@ sub start_tag {
 
   return if $self->inside_ignore;
 
-  # already inside an open component, let it handle tag
-  if ($self->current->open) {
-    $self->current->start_tag($node);
-  }
-
   # no open component, and this tag matches selector
+  if ($self->current->open) {
+    $self->current->start_tag($node, $raw);
+  }
   elsif (my $type = $self->matches_type($node)) {
     my $component = "HtmlToApple::Component::$type"->new(attr => $attr);
 
     push @{$self->components}, $component;
     $node->attributes->{component} = $component;
+    $component->start_tag($node, $raw);
 
     $component->close if $empty;
   }
@@ -148,6 +143,9 @@ sub inside_ignore {
   my ($self) = @_;
   for my $ignore (@IGNORE) {
     my @matches = $self->root->findnodes($ignore);
+    return 0 unless @matches;
+    return 1 if any {refaddr($self->tag) eq refaddr($_)} @matches;
+
     for my $ancestor ($self->tag->ancestors) {
       return 1 if any {refaddr($ancestor) eq refaddr($_)} @matches;
     }
@@ -165,7 +163,7 @@ sub text_node {
 }
 
 sub end_tag {
-  my ($self, $tag) = @_;
+  my ($self, $tag, $raw) = @_;
 
   if ($tag ne $self->tag->name) {
     warn "closing unmatched tag $tag";
@@ -174,9 +172,10 @@ sub end_tag {
 
   if ($self->tag->attributes->{component}) {
     $self->tag->attributes->{component}->close;
+    $self->current->end_tag($self->tag, $raw);
   }
-  else {
-    $self->current->end_tag($self->tag);
+  elsif (!$self->inside_ignore) {
+    $self->current->end_tag($self->tag, $raw);
   }
 
   $self->{tag} = $self->tag->unlink_from_mother;
