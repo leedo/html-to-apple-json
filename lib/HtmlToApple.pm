@@ -38,7 +38,7 @@ our @TYPES = (
 $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 sub new {
-  my ($class, %args) = @_;
+  my ($class) = @_;
   my $root = HtmlToApple::Tag->new({name => "root"});
 
   return bless {
@@ -71,6 +71,7 @@ sub parse {
   $self->parser->parse($chunk);
 }
 
+# fix up the final list of components
 sub cleanup {
   my ($self) = @_;
 
@@ -78,7 +79,7 @@ sub cleanup {
   my @comps = @{$self->components};
 
   while (my $c = shift @comps) {
-    # skip empties or lone captions
+    # skip empty or lone captions
     next if $c->type eq "Empty";
     next if $c->type eq "Caption";
 
@@ -111,11 +112,11 @@ sub dump {
 }
 
 sub start_tag {
-  my ($self, $tag, $attr, $raw) = @_;
+  my ($self, $name, $attr, $raw) = @_;
 
   # create new tag as a child of current tag
-  my $node = $self->{tag} = $self->{tag}->new_daughter({
-    name => $tag,
+  my $tag = $self->{tag} = $self->{tag}->new_daughter({
+    name => $name,
     raw => $raw,
     attributes => $attr,
   });
@@ -123,25 +124,25 @@ sub start_tag {
   # feed to current component, or try to make a new one
   if (!$self->inside_ignore) {
     if ($self->current->open) {
-      $self->current->start_tag($node, $raw);
+      $self->current->start_tag($tag, $raw);
     }
-    elsif (my $type = $self->matches_type($node)) {
+    elsif (my $type = $self->matches_type($tag)) {
       my $component = "HtmlToApple::Component::$type"->new(attr => $attr);
 
       push @{$self->components}, $component;
-      $node->attributes->{component} = $component;
-      $component->start_tag($node, $raw);
+      $tag->attributes->{component} = $component;
+      $component->start_tag($tag, $raw);
     }
   }
 
   # manually end the tag if it is an empty tag (e.g. img)
-  $self->end_tag($tag, $raw) if $node->empty;
+  $self->end_tag($name, $raw) if $tag->empty;
 }
 
 sub matches_type {
-  my ($self, $node) = @_;
+  my ($self, $tag) = @_;
   for my $type (@TYPES) {
-    return $type->[0] if $node->matches($type->[1]);
+    return $type->[0] if $tag->matches($type->[1]);
   }
 }
 
