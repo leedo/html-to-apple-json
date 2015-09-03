@@ -32,11 +32,6 @@ sub end_tag {
   }
 }
 
-sub concat {
-  my ($self, $comp) = @_;
-  push @{$self->html}, @{$comp->html};
-}
-
 sub as_markdown {
   my ($self) = @_;
 

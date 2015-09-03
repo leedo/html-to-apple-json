@@ -5,7 +5,6 @@ use Moo;
 has attr => (is => "ro", default => sub {{}});
 has open => (is => "rw", default => sub {1});
 
-sub allowed_attr { [] }
 sub start_tag { }
 sub end_tag { }
 
@@ -19,17 +18,9 @@ sub close {
   $self->open(0);
 }
 
-sub attr_data {
-  my $self = shift;
-  map {$_ => $self->attr->{$_}}
-    grep {defined $self->attr->{$_}}
-    @{$self->allowed_attr};
-}
-
 sub as_data {
   my ($self) = @_;
   return {
-    $self->attr_data,
     type => $self->type,
   };
 }

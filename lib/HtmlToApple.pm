@@ -28,8 +28,8 @@ our @TYPES = (
   [Heading   => 'h1, h2, h3, h4'],
   [Pullquote => 'blockquote.pullquote'],
   [Tweet     => 'blockquote.twitter-tweet'],
-  [Image     => 'img'],
-  [Caption   => 'figcaption'],
+  [Image     => 'figure.image img'],
+  [Caption   => 'figure figcaption'],
   [Gallery   => 'div.gallery'],
 );
 
@@ -72,8 +72,6 @@ sub parse {
   $self->{parser}->parse($chunk);
 }
 
-# remove empty components, and joins
-# consective types that can concat
 sub cleanup {
   my ($self) = @_;
 
@@ -81,11 +79,21 @@ sub cleanup {
   my @comps = @{$self->components};
 
   while (my $c = shift @comps) {
+    # skip empties or lone captions
     next if $c->type eq "Empty";
+    next if $c->type eq "Caption";
 
+    # join consecutive bodies
     if ($c->can("concat")) {
       while (@comps and $comps[0]->type eq $c->type) {
         $c->concat(shift @comps);
+      }
+    }
+
+    # look for captions following image/video/etc
+    if ($c->can("caption")) {
+      if (@comps and $comps[0]->type eq "Caption") {
+        $c->caption((shift @comps)->as_markdown);
       }
     }
 
