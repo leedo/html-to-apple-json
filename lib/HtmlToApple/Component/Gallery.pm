@@ -19,7 +19,6 @@ sub start_tag {
 sub as_data {
   my ($self) = @_;
   return {
-    $self->attr_data,
     images => $self->images,
     type => $self->type,
   };
