@@ -1,22 +1,31 @@
 package HtmlToApple::Component::Markdown;
 
 use Moo;
-use List::Util qw{any first sum};
+use List::Util qw{any};
+use IPC::Open3;
+use Symbol 'gensym';
+use Encode;
 
 extends "HtmlToApple::Component";
 
 has html => (is => "ro", default => sub {[]});
 
 sub type { "Markdown" }
-
 sub allowed_tags { () }
 
 sub start_tag {
-  my ($self, $node, $raw) = @_;
+  my ($self, $tag, $raw) = @_;
+  $self->add_tag($tag, $raw);
+}
 
-  if (!$self->allowed_tags or any {$_ eq $node->name} $self->allowed_tags) {
-    push @{$self->html}, $raw;
-  }
+sub allowed_tag {
+  my ($self, $name) = @_;
+  !$self->allowed_tags or any {$_ eq $name} $self->allowed_tags
+}
+
+sub add_tag {
+  my ($self, $tag, $raw) = @_;
+  push @{$self->html}, $raw if $self->allowed_tag($tag->name);
 }
 
 sub add_text {
@@ -25,19 +34,12 @@ sub add_text {
 }
 
 sub end_tag {
-  my ($self, $node, $raw) = @_;
-
-  if (!$self->allowed_tags or any {$_ eq $node->name} $self->allowed_tags) {
-    push @{$self->html}, $raw;
-  }
+  my ($self, $tag, $raw) = @_;
+  $self->add_tag($tag, $raw);
 }
 
 sub as_markdown {
   my ($self) = @_;
-
-  use IPC::Open3;
-  use Symbol 'gensym'; 
-  use Encode;
 
   my ($w, $r, $e);
   $e = gensym;

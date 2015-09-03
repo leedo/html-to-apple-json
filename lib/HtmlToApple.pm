@@ -171,9 +171,12 @@ sub end_tag {
     return;
   }
 
+  if (!$self->inside_ignore) {
+    $self->current->end_tag($self->tag, $raw);
+  }
+
   if ($self->tag->attributes->{component}) {
     $self->tag->attributes->{component}->close;
-    $self->current->end_tag($self->tag, $raw);
   }
 
   $self->{tag} = $self->tag->unlink_from_mother;
