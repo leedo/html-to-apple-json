@@ -44,7 +44,7 @@ sub as_markdown {
   my ($w, $r, $e);
   $e = gensym;
 
-  my $pid = open3 $w, $r, $e, "pandoc", qw{-f html -t markdown --no-wrap -};
+  my $pid = open3 $w, $r, $e, qw{pandoc -f html -t markdown --no-wrap -};
 
   while (my $chunk = shift @{$self->html}) {
     print $w encode utf8 => $chunk;

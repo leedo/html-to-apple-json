@@ -56,7 +56,7 @@ sub parser {
     $self->{parser} = HTML::Parser->new(
       api_version => 3,
       start_h => [sub { $self->start_tag(@_) }, "tagname,attr,text"],
-      text_h  => [sub { $self->text_node(@_) },  "dtext"],
+      text_h  => [sub { $self->text_node(@_) }, "dtext"],
       end_h   => [sub { $self->end_tag(@_) },   "tagname,text"],
     );
   }
@@ -71,6 +71,18 @@ sub current { $_[0]->components->[-1] }
 sub parse {
   my ($self, $chunk) = @_;
   $self->parser->parse($chunk);
+}
+
+sub eof {
+  my ($self) = @_;
+  $self->parser->eof;
+  $self->{root}->delete_tree;
+  $self->cleanup;
+}
+
+sub dump {
+  my ($self) = @_;
+  return [map {$_->as_data} @{$self->components}];
 }
 
 # fix up the final list of components
@@ -103,14 +115,6 @@ sub cleanup {
   }
 
   $self->{components} = [@clean];
-}
-
-sub dump {
-  my ($self) = @_;
-  $self->parser->eof;
-  $self->{root}->delete_tree;
-  $self->cleanup;
-  return [map {$_->as_data} @{$self->components}];
 }
 
 sub start_tag {
