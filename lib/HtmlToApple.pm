@@ -113,16 +113,15 @@ sub dump {
 sub start_tag {
   my ($self, $tag, $attr, $raw) = @_;
 
-  my $node = $self->{tag}->new_daughter({
+  # create new tag as a child of current tag
+  my $node = $self->{tag} = $self->{tag}->new_daughter({
     name => $tag,
     raw => $raw,
     attributes => $attr,
   });
 
-  $self->{tag} = $node;
-
+  # feed to current component, or try to make a new one
   if (!$self->inside_ignore) {
-    # no open component, and this tag matches selector
     if ($self->current->open) {
       $self->current->start_tag($node, $raw);
     }
@@ -135,6 +134,7 @@ sub start_tag {
     }
   }
 
+  # manually end the tag if it is an empty tag (e.g. img)
   $self->end_tag($tag, $raw) if $node->empty;
 }
 
