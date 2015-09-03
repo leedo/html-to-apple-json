@@ -16,6 +16,7 @@ use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Pullquote;
 use HtmlToApple::Component::Tweet;
 use HtmlToApple::Component::Image;
+use HtmlToApple::Component::Video;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 
@@ -29,6 +30,7 @@ our @TYPES = (
   [Pullquote => 'blockquote.pullquote'],
   [Tweet     => 'blockquote.twitter-tweet'],
   [Image     => 'figure.image img'],
+  [Video     => 'figure.video'],
   [Caption   => 'figure figcaption'],
   [Gallery   => 'div.gallery'],
 );

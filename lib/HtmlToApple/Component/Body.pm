@@ -2,7 +2,7 @@ package HtmlToApple::Component::Body;
 
 use Moo;
 
-extends "HtmlToApple::Component::HTML";
+extends "HtmlToApple::Component::Markdown";
 
 sub type { "Body" }
 
