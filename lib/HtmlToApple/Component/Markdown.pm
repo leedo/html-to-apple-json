@@ -18,9 +18,9 @@ sub start_tag {
   $self->add_tag($tag, $raw);
 }
 
-sub allowed_tag {
-  my ($self, $name) = @_;
-  !$self->allowed_tags or any {$_ eq $name} $self->allowed_tags
+sub end_tag {
+  my ($self, $tag, $raw) = @_;
+  $self->add_tag($tag, $raw);
 }
 
 sub add_tag {
@@ -28,14 +28,14 @@ sub add_tag {
   push @{$self->html}, $raw if $self->allowed_tag($tag->name);
 }
 
+sub allowed_tag {
+  my ($self, $name) = @_;
+  !$self->allowed_tags or any {$_ eq $name} $self->allowed_tags
+}
+
 sub add_text {
   my ($self, $text) = @_;
   push @{$self->html}, $text;
-}
-
-sub end_tag {
-  my ($self, $tag, $raw) = @_;
-  $self->add_tag($tag, $raw);
 }
 
 sub as_markdown {
@@ -44,7 +44,7 @@ sub as_markdown {
   my ($w, $r, $e);
   $e = gensym;
 
-  my $pid = open3 $w, $r, $e, "/usr/bin/pandoc -f html -t markdown --no-wrap -";
+  my $pid = open3 $w, $r, $e, "pandoc", qw{-f html -t markdown --no-wrap -};
 
   while (my $chunk = shift @{$self->html}) {
     print $w encode utf8 => $chunk;

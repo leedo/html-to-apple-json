@@ -21,7 +21,9 @@ use HtmlToApple::Component::Gallery;
 # ignore anything that matches or falls under these
 our @IGNORE = ('aside', 'script', 'style');
 
-# map component types to CSS selector
+# if we hit one of these CSS selectors when NOT inside
+# an existing component, we will use the corresponding
+# type to make a new component
 our @TYPES = (
   [Body      => 'p, ol, ul, blockquote'],
   [Heading   => 'h1, h2, h3, h4'],
