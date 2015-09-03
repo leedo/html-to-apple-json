@@ -2,7 +2,7 @@ package HtmlToApple::Component::Caption;
 
 use Moo;
 
-extends "HtmlToApple::Component::Text";
+extends "HtmlToApple::Component::HTML";
 
 sub type { "Caption" }
 

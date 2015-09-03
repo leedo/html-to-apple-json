@@ -12,6 +12,7 @@ use Scalar::Util qw{refaddr};
 # import types of components used in final document
 use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Body;
+use HtmlToApple::Component::Heading;
 use HtmlToApple::Component::Pullquote;
 use HtmlToApple::Component::Tweet;
 use HtmlToApple::Component::Image;
@@ -23,7 +24,8 @@ our @IGNORE = ('aside', 'script', 'style');
 
 # map component types to CSS selector
 our @TYPES = (
-  [Body      => 'p, ol, ul, blockquote, h1, h2, h3, h4'],
+  [Body      => 'p, ol, ul, blockquote'],
+  [Heading   => 'h1, h2, h3, h4'],
   [Pullquote => 'blockquote.pullquote'],
   [Tweet     => 'blockquote.twitter-tweet'],
   [Image     => 'img'],
