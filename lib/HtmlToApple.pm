@@ -4,10 +4,8 @@ use strict;
 use warnings;
 
 use HTML::Parser;
-use Tree::DAG_Node::XPath;
+use HtmlToApple::Tag;
 use HTML::Selector::XPath qw{selector_to_xpath};
-use List::Util qw{any all};
-use Scalar::Util qw{refaddr};
 
 # import types of components used in final document
 use HtmlToApple::Component::Empty;
@@ -35,9 +33,6 @@ our @TYPES = (
   [Gallery   => 'div.gallery'],
 );
 
-# empty tags, don't look for matching close tag
-our @EMPTY = qw{img br hr meta link base embed param area col input};
-
 # convert CSS selectors to XPath ahead of time
 @IGNORE = map {selector_to_xpath($_)} @IGNORE;
 $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
@@ -45,7 +40,7 @@ $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 sub new {
   my ($class, %args) = @_;
   my $self = bless {
-    root => Tree::DAG_Node::XPath->new({name => "root"}),
+    root => HtmlToApple::Tag->new({name => "root"}),
     components => [HtmlToApple::Component::Empty->new],
   }, $class;
 
@@ -116,51 +111,42 @@ sub dump {
 sub start_tag {
   my ($self, $tag, $attr, $raw) = @_;
 
-  my $empty = any {$tag eq $_} @EMPTY;
   my $node = $self->{tag}->new_daughter({
     name => $tag,
+    raw => $raw,
     attributes => $attr,
   });
 
-  $self->{tag} = $node unless $empty;
+  $self->{tag} = $node;
 
-  return if $self->inside_ignore;
+  if (!$self->inside_ignore) {
+    # no open component, and this tag matches selector
+    if ($self->current->open) {
+      $self->current->start_tag($node, $raw);
+    }
+    elsif (my $type = $self->matches_type($node)) {
+      my $component = "HtmlToApple::Component::$type"->new(attr => $attr);
 
-  # no open component, and this tag matches selector
-  if ($self->current->open) {
-    $self->current->start_tag($node, $raw);
+      push @{$self->components}, $component;
+      $node->attributes->{component} = $component;
+      $component->start_tag($node, $raw);
+    }
   }
-  elsif (my $type = $self->matches_type($node)) {
-    my $component = "HtmlToApple::Component::$type"->new(attr => $attr);
 
-    push @{$self->components}, $component;
-    $node->attributes->{component} = $component;
-    $component->start_tag($node, $raw);
-
-    $component->close if $empty;
-  }
+  $self->end_tag($tag, $raw) if $node->empty;
 }
 
 sub matches_type {
   my ($self, $node) = @_;
   for my $type (@TYPES) {
-    my @matches = $self->root->findnodes($type->[1]);
-    if (any {refaddr($node) == refaddr($_)} @matches) {
-      return $type->[0];
-    }
+    return $type->[0] if $node->matches($type->[1]);
   }
 }
 
 sub inside_ignore {
   my ($self) = @_;
   for my $ignore (@IGNORE) {
-    my @matches = $self->root->findnodes($ignore);
-    return 0 unless @matches;
-    return 1 if any {refaddr($self->tag) eq refaddr($_)} @matches;
-
-    for my $ancestor ($self->tag->ancestors) {
-      return 1 if any {refaddr($ancestor) eq refaddr($_)} @matches;
-    }
+    return 1 if $self->tag->matches_up($ignore);
   }
 }
 
@@ -184,9 +170,6 @@ sub end_tag {
 
   if ($self->tag->attributes->{component}) {
     $self->tag->attributes->{component}->close;
-    $self->current->end_tag($self->tag, $raw);
-  }
-  elsif (!$self->inside_ignore) {
     $self->current->end_tag($self->tag, $raw);
   }
 
