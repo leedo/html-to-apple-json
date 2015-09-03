@@ -115,11 +115,7 @@ sub start_tag {
   my ($self, $name, $attr, $raw) = @_;
 
   # create new tag as a child of current tag
-  my $tag = $self->{tag} = $self->{tag}->new_daughter({
-    name => $name,
-    raw => $raw,
-    attributes => $attr,
-  });
+  my $tag = $self->{tag} = $self->{tag}->append($name, $attr, $raw);
 
   # feed to current component, or try to make a new one
   if (!$self->inside_ignore) {

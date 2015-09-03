@@ -45,4 +45,12 @@ sub matches_up {
   }
 }
 
+sub append {
+  my ($self, $name, $attr, $raw) = @_;
+  return $self->new_daughter({
+    name => $name,
+    attributes => {%$attr, raw => $raw},
+  });
+}
+
 1;
