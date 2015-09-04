@@ -7,8 +7,6 @@ extends "HtmlToApple::Component";
 has "open" => (is => "rw", default => sub {0});
 has "caption" => (is => "rw");
 
-sub type { "Video" }
-
 sub as_data {
   my ($self) = @_;
   return {

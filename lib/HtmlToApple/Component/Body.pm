@@ -4,8 +4,6 @@ use Moo;
 
 extends "HtmlToApple::Component::Markdown";
 
-sub type { "Body" }
-
 sub concat {
   my ($self, $comp) = @_;
   push @{$self->html}, @{$comp->html};

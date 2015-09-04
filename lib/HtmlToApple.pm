@@ -43,7 +43,7 @@ $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 sub new {
   my ($class) = @_;
-  my $tag = HtmlToApple::Tag->new({name => "root"});
+  my $tag = HtmlToApple::Tag->new({name => "body"});
   my $component = HtmlToApple::Component::Empty->new;
 
   return bless {
@@ -137,7 +137,7 @@ sub end_tag {
   my ($self, $name, $raw) = @_;
 
   if ($name ne $self->tag->name) {
-    warn "closing unmatched tag $name";
+    warn sprintf "closing unmatched tag %s vs %s", $name, $self->tag->name;
     return;
   }
 

@@ -5,6 +5,11 @@ use List::Util qw{any};
 
 extends "Tree::DAG_Node::XPath";
 
+sub type {
+  my ($self) = @_;
+  $self->name;
+}
+
 sub append {
   my ($self, $type, $attr) = @_;
   my $component = "HtmlToApple::Component::$type"->new;

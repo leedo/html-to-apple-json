@@ -6,8 +6,6 @@ extends "HtmlToApple::Component";
 
 has "caption" => (is => "rw");
 
-sub type { "Image" }
-
 sub as_data {
   my ($self) = @_;
   return {

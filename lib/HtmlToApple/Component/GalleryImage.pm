@@ -3,7 +3,6 @@ package HtmlToApple::Component::GalleryImage;
 use parent "HtmlToApple::Component";
 
 sub accepts { "Caption" }
-sub type { "GalleryImage" }
 
 sub caption {
   my ($self, $caption) = @_;

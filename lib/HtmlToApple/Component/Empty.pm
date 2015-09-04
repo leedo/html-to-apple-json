@@ -3,7 +3,6 @@ package HtmlToApple::Component::Empty;
 use parent "HtmlToApple::Component";
 
 sub accepts { 1 }
-sub type { "Empty" }
 
 sub clean {
   my ($self) = @_;

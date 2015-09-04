@@ -10,13 +10,10 @@ extends "HtmlToApple::Component";
 
 has html => (is => "ro", default => sub {[]});
 
-sub type { "Markdown" }
 sub allowed_tags { () }
 
 sub start_tag {
   my ($self, $tag, $raw) = @_;
-  # ignore p tags inside blockquote
-  return if $tag->name eq "p" and $tag->matches_up("blockquote");
   $self->add_tag($tag, $raw);
 }
 
@@ -27,14 +24,19 @@ sub end_tag {
 
 sub add_tag {
   my ($self, $tag, $raw) = @_;
-  # ignore p tags inside blockquote
-  return if $tag->name eq "p" and $tag->matches_up("blockquote");
-  push @{$self->html}, $raw if $self->allowed_tag($tag->name);
+  push @{$self->html}, $raw if $self->allowed_tag($tag);
 }
 
 sub allowed_tag {
-  my ($self, $name) = @_;
-  !$self->allowed_tags or any {$_ eq $name} $self->allowed_tags
+  my ($self, $tag) = @_;
+
+  if (any {$_ eq $tag->name} $self->allowed_tags) {
+    # ignore p tags inside blockquote
+    return 0 if $tag->name eq "p" and $tag->matches_up("blockquote");
+    return 1;
+  }
+
+  return !$self->allowed_tags;
 }
 
 sub add_text {
