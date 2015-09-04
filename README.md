@@ -2,6 +2,6 @@
 
 Should output JSON string of components
 
-<pre>prove -Ilib t</pre>
+<pre>prove -l</pre>
 
 Should run some tests
