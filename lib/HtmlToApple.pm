@@ -7,7 +7,7 @@ use HTML::Parser;
 use HtmlToApple::Tag;
 use HTML::Selector::XPath qw{selector_to_xpath};
 
-# import types of components used in final document
+# import types of components used to build final document
 use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Body;
 use HtmlToApple::Component::Heading;
@@ -26,15 +26,15 @@ our @IGNORE = ('aside', 'script', 'style', 'div.gallery-main-image');
 # accepts the new type: we create a new component, append
 # it to the current component, make make it the new current component
 our @TYPES = (
-  [Heading   => 'h1, h2, h3, h4'],
-  [Pullquote => 'blockquote.pullquote'],
-  [Tweet     => 'blockquote.twitter-tweet'],
-  [Image     => 'figure.image img'],
-  [Video     => 'figure.video'],
-  [Caption   => 'figure figcaption, div.gallery-thumb-copy p'],
-  [Gallery   => 'div.gallery'],
+  [Heading      => 'h1, h2, h3, h4'],
+  [Pullquote    => 'blockquote.pullquote'],
+  [Tweet        => 'blockquote.twitter-tweet'],
+  [Image        => 'figure.image img'],
+  [Video        => 'figure.video'],
+  [Caption      => 'figure figcaption, div.gallery-thumb-copy p'],
+  [Gallery      => 'div.gallery'],
   [GalleryImage => 'ol.gallery-thumbs a[data-orig]'],
-  [Body      => 'p, ol, ul, blockquote'],
+  [Body         => 'p, ol, ul, blockquote'],
 );
 
 # convert CSS selectors to XPath ahead of time
