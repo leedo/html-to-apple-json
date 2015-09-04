@@ -145,6 +145,7 @@ sub end_tag {
 
   if ($self->tag->attributes->{component}) {
     $self->{component} = $self->tag->attributes->{component}->mother;
+    delete $self->tag->attributes->{component};
   }
 
   $self->{tag} = $self->tag->unlink_from_mother;

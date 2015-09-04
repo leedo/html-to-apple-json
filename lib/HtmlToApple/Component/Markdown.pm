@@ -70,6 +70,7 @@ sub as_markdown {
 
   waitpid $pid, 0;
 
+  chomp $md;
   return $md;
 }
 
