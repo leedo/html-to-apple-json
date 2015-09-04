@@ -31,8 +31,8 @@ sub allowed_tag {
   my ($self, $tag) = @_;
 
   if (any {$_ eq $tag->name} $self->allowed_tags) {
-    # ignore p tags inside blockquote
-    return 0 if $tag->name eq "p" and $tag->matches_up("blockquote");
+    # ignore p tags inside blockquote or li
+    return 0 if $tag->name eq "p" and $tag->matches_up(qw{blockquote li});
     return 1;
   }
 
