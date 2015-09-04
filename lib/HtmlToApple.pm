@@ -77,6 +77,7 @@ sub eof {
   my ($self) = @_;
   $self->parser->eof;
   $self->{tag}->root->delete_tree;
+  delete $self->{tag};
 }
 
 sub dump {

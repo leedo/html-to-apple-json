@@ -47,6 +47,8 @@ sub add_text {
 sub as_markdown {
   my ($self) = @_;
 
+  return "" unless @{$self->html};
+
   my ($w, $r, $e);
   $e = gensym;
 

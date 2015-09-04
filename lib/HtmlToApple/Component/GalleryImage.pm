@@ -14,7 +14,7 @@ sub as_data {
   return {
     type => $self->name,
     src => $self->attributes->{"data-orig"},
-    caption => $self->attributes->{"caption"},
+    caption => $self->attributes->{"caption"} || "",
   };
 }
 
