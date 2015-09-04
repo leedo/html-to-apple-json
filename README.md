@@ -1,7 +1,8 @@
-<pre>perl -Ilib parse.pl t/comcast-vp.html</pre>
+<pre>brew install cpanminus
+cpanm --installdeps .</pre>
 
-Should output JSON string of components
+install deps (may need sudo on cpanm command)
 
 <pre>prove -l</pre>
 
-Should run some tests
+run some tests
