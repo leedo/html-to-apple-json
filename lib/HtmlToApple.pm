@@ -17,22 +17,24 @@ use HtmlToApple::Component::Image;
 use HtmlToApple::Component::Video;
 use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
+use HtmlToApple::Component::GalleryImage;
 
 # ignore anything that matches or falls under these
-our @IGNORE = ('aside', 'script', 'style');
+our @IGNORE = ('aside', 'script', 'style', 'div.gallery-main-image');
 
 # if we hit one of these CSS selectors when NOT inside
 # an existing component, we will use the corresponding
 # type to make a new component
 our @TYPES = (
-  [Body      => 'p, ol, ul, blockquote'],
   [Heading   => 'h1, h2, h3, h4'],
   [Pullquote => 'blockquote.pullquote'],
   [Tweet     => 'blockquote.twitter-tweet'],
   [Image     => 'figure.image img'],
   [Video     => 'figure.video'],
-  [Caption   => 'figure figcaption'],
+  [Caption   => 'figure figcaption, div.gallery-thumb-copy p'],
   [Gallery   => 'div.gallery'],
+  [GalleryImage => 'ol.gallery-thumbs a[data-orig]'],
+  [Body      => 'p, ol, ul, blockquote'],
 );
 
 # convert CSS selectors to XPath ahead of time
@@ -41,12 +43,12 @@ $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 sub new {
   my ($class) = @_;
-  my $root = HtmlToApple::Tag->new({name => "root"});
+  my $tag = HtmlToApple::Tag->new({name => "root"});
+  my $component = HtmlToApple::Component::Empty->new;
 
   return bless {
-    root => $root,
-    tag => $root,
-    components => [HtmlToApple::Component::Empty->new],
+    tag => $tag,
+    component => $component,
   }, $class;
 }
 
@@ -63,10 +65,8 @@ sub parser {
   return $self->{parser};
 }
 
-sub components { $_[0]->{components} }
-sub root { $_[0]->{root} }
 sub tag { $_[0]->{tag} }
-sub current { $_[0]->components->[-1] }
+sub component { $_[0]->{component} }
 
 sub parse {
   my ($self, $chunk) = @_;
@@ -76,45 +76,12 @@ sub parse {
 sub eof {
   my ($self) = @_;
   $self->parser->eof;
-  $self->{root}->delete_tree;
-  $self->cleanup;
+  $self->{tag}->root->delete_tree;
 }
 
 sub dump {
   my ($self) = @_;
-  return [map {$_->as_data} @{$self->components}];
-}
-
-# fix up the final list of components
-sub cleanup {
-  my ($self) = @_;
-
-  my @clean;
-  my @comps = @{$self->components};
-
-  while (my $c = shift @comps) {
-    # skip empty or lone captions
-    next if $c->type eq "Empty";
-    next if $c->type eq "Caption";
-
-    # join consecutive bodies
-    if ($c->can("concat")) {
-      while (@comps and $comps[0]->type eq $c->type) {
-        $c->concat(shift @comps);
-      }
-    }
-
-    # look for captions following image/video/etc
-    if ($c->can("caption")) {
-      if (@comps and $comps[0]->type eq "Caption") {
-        $c->caption((shift @comps)->as_markdown);
-      }
-    }
-
-    push @clean, $c;
-  }
-
-  $self->{components} = [@clean];
+  return $self->component->root->as_data;
 }
 
 sub start_tag {
@@ -123,18 +90,19 @@ sub start_tag {
   # create new tag as a child of current tag
   my $tag = $self->{tag} = $self->{tag}->append($name, $attr, $raw);
 
-  # feed to current component, or try to make a new one
   if (!$self->inside_ignore) {
-    if ($self->current->open) {
-      $self->current->start_tag($tag, $raw);
+    if (my $type = $self->matches_type($tag)) {
+      if ($self->component->accepts($type)) {
+        my $component = $self->component->append($type, $attr);
+        $tag->attributes->{component} = $component;
+        $self->{component} = $component;
+      }
+      else {
+        warn sprintf "matched %s inside a %s\n", $type, $self->component->type;
+      }
     }
-    elsif (my $type = $self->matches_type($tag)) {
-      my $component = "HtmlToApple::Component::$type"->new(attr => $attr);
 
-      push @{$self->components}, $component;
-      $tag->attributes->{component} = $component;
-      $component->start_tag($tag, $raw);
-    }
+    $self->component->start_tag($tag, $raw);
   }
 
   # manually end the tag if it is an "empty tag" (e.g. img)
@@ -160,8 +128,8 @@ sub text_node {
   return if $self->inside_ignore;
   return if $text =~ /^\s*$/;
 
-  if ($self->current->can("add_text")) {
-    $self->current->add_text($text);
+  if ($self->component->can("add_text")) {
+    $self->component->add_text($text);
   }
 }
 
@@ -174,11 +142,11 @@ sub end_tag {
   }
 
   if (!$self->inside_ignore) {
-    $self->current->end_tag($self->tag, $raw);
+    $self->component->end_tag($self->tag, $raw);
   }
 
   if ($self->tag->attributes->{component}) {
-    $self->tag->attributes->{component}->close;
+    $self->{component} = $self->tag->attributes->{component}->mother;
   }
 
   $self->{tag} = $self->tag->unlink_from_mother;

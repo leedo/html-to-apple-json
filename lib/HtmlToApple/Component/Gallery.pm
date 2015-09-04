@@ -1,28 +1,30 @@
 package HtmlToApple::Component::Gallery;
 
-use Moo;
+use parent "HtmlToApple::Component";
 
-extends "HtmlToApple::Component";
-
-has images => (is => "rw", default => sub {[]});
-
+sub accepts_types { qw{GalleryImage Caption} }
 sub type { "Gallery" }
 
-sub start_tag {
-  my ($self, $node) = @_;
-
-  if ($node->name eq "a" and $node->attributes->{"data-orig"}) {
-    push @{$self->images}, $node->attributes->{"data-orig"};
+sub images {
+  my ($self) = @_;
+  my @images;
+  for my $daughter ($self->daughters) {
+    if ($daughter->type eq "GalleryImage") {
+      push @images, $daughter;
+    }
+    if ($daughter->type eq "Caption" and @images) {
+      $images[-1]->caption($daughter->as_markdown);
+    }
   }
+  return @images;
 }
 
 sub as_data {
   my ($self) = @_;
   return {
-    images => $self->images,
-    type => $self->type,
-  };
+    type => $self->name,
+    images => [map {$_->as_data} $self->images],
+  }
 }
-
 
 1;

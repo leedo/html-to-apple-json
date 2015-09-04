@@ -15,6 +15,8 @@ sub allowed_tags { () }
 
 sub start_tag {
   my ($self, $tag, $raw) = @_;
+  # ignore p tags inside blockquote
+  return if $tag->name eq "p" and $tag->matches_up("blockquote");
   $self->add_tag($tag, $raw);
 }
 
@@ -25,6 +27,8 @@ sub end_tag {
 
 sub add_tag {
   my ($self, $tag, $raw) = @_;
+  # ignore p tags inside blockquote
+  return if $tag->name eq "p" and $tag->matches_up("blockquote");
   push @{$self->html}, $raw if $self->allowed_tag($tag->name);
 }
 

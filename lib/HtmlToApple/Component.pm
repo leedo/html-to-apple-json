@@ -1,28 +1,32 @@
 package HtmlToApple::Component;
 
 use Moo;
+use List::Util qw{any};
 
-has attr => (is => "ro", default => sub {{}});
-has open => (is => "rw", default => sub {1});
+extends "Tree::DAG_Node::XPath";
+
+sub append {
+  my ($self, $type, $attr) = @_;
+  my $component = "HtmlToApple::Component::$type"->new;
+  $component->name($type);
+  $component->attributes($attr);
+  $self->add_daughter($component);
+  return $component;
+}
+
+sub accepts_types { () }
+sub accepts {
+  my ($self, $type) = @_;
+  any {$_ eq $type} $self->accepts_types;
+}
 
 sub start_tag { }
 sub end_tag { }
 
-# this is a base class for other components
-# so we die if anything is not overridden
-
-sub type { die "has no type" }
-
-sub close {
-  my $self = shift;
-  $self->open(0);
-}
-
 sub as_data {
-  my ($self) = @_;
-  return {
-    type => $self->type,
-  };
+  my $self = shift;
+  return {type => $self->type};
 }
+
 
 1;
