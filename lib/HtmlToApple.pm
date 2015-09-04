@@ -22,9 +22,9 @@ use HtmlToApple::Component::GalleryImage;
 # ignore anything that matches or falls under these
 our @IGNORE = ('aside', 'script', 'style', 'div.gallery-main-image');
 
-# if we hit one of these CSS selectors when NOT inside
-# an existing component, we will use the corresponding
-# type to make a new component
+# if we hit one of these CSS selectors, and the current component
+# accepts the new type: we create a new component, append
+# it to the current component, make make it the new current component
 our @TYPES = (
   [Heading   => 'h1, h2, h3, h4'],
   [Pullquote => 'blockquote.pullquote'],
