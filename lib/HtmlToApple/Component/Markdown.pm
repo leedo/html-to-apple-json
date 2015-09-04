@@ -77,7 +77,8 @@ sub as_markdown {
 sub as_data {
   my ($self) = @_;
   return {
-    markdown => $self->as_markdown,
+    format => "markdown",
+    text => $self->as_markdown,
     type => $self->type,
   };
 }
