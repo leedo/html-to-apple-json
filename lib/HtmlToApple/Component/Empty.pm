@@ -1,6 +1,7 @@
 package HtmlToApple::Component::Empty;
 
-use parent "HtmlToApple::Component";
+use Moo;
+extends "HtmlToApple::Component";
 
 sub accepts { 1 }
 

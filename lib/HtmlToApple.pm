@@ -32,7 +32,7 @@ our @TYPES = (
   [Image        => 'figure.image img'],
   [Video        => 'figure.video'],
   [Caption      => 'figure figcaption, div.gallery-thumb-copy p'],
-  [Gallery      => 'div.gallery'],
+  [Gallery      => 'ol.gallery-thumbs'],
   [GalleryImage => 'ol.gallery-thumbs a[data-orig]'],
   [Body         => 'p, ol, ul, blockquote'],
 );
@@ -43,12 +43,9 @@ $_->[1] = selector_to_xpath($_->[1]) for @TYPES;
 
 sub new {
   my ($class) = @_;
-  my $tag = HtmlToApple::Tag->new({name => "body"});
-  my $component = HtmlToApple::Component::Empty->new;
-
   return bless {
-    tag => $tag,
-    component => $component,
+    tag => HtmlToApple::Tag->new({name => "body"}),
+    component => HtmlToApple::Component::Empty->new,
   }, $class;
 }
 

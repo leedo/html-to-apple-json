@@ -1,6 +1,7 @@
 package HtmlToApple::Component::Gallery;
 
-use parent "HtmlToApple::Component";
+use Moo;
+extends "HtmlToApple::Component";
 
 sub accepts_types { qw{GalleryImage Caption} }
 

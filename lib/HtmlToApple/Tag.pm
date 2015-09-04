@@ -1,8 +1,10 @@
 package HtmlToApple::Tag;
 
-use parent "Tree::DAG_Node::XPath";
-use List::Util qw{any all};
+use Moo;
+use List::Util qw{any};
 use Scalar::Util qw{refaddr};
+
+extends "Tree::DAG_Node::XPath";
 
 # empty tags, don't look for matching close tag
 our @EMPTY = qw{img br hr meta link base embed param area col input};
@@ -13,7 +15,7 @@ sub empty {
   return 1 if any {$self->name eq $_} @EMPTY;
 
   if (defined $self->attributes->{raw}) {
-    return 1 if $self->attributes->{row} =~ m{/>$};
+    return 1 if $self->attributes->{raw} =~ m{/>$};
   }
 
   return 0;
