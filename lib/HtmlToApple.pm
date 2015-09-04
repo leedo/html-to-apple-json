@@ -96,7 +96,7 @@ sub start_tag {
         $self->{component} = $component;
       }
       else {
-        warn sprintf "matched %s inside a %s\n", $type, $self->component->type;
+        warn sprintf "rejected %s inside a %s", $type, $self->component->type;
       }
     }
 
