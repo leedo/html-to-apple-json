@@ -124,11 +124,7 @@ sub inside_ignore {
 sub text_node {
   my ($self, $text) = @_;
   return if $self->inside_ignore;
-  return if $text =~ /^\s*$/;
-
-  if ($self->component->can("add_text")) {
-    $self->component->add_text($text);
-  }
+  $self->component->add_text($text) if $self->component->can("add_text");
 }
 
 sub end_tag {
