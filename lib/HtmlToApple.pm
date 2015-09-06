@@ -23,13 +23,8 @@ sub new {
   my ($class, %opts) = @_;
 
   # convert CSS selectors to XPath selectors
-  my @types = map {
-    [$_->[0], selector_to_xpath($_->[1])]
-  } defined $opts{types} ? @{$opts{types}} : ();
-
-  my @ignore = map {
-    selector_to_xpath($_)
-  } defined $opts{ignore} ? @{$opts{ignore}} : ();
+  my @types  = map {[$_->[0], selector_to_xpath $_->[1]]} @{$opts{types} || []};
+  my @ignore = map {selector_to_xpath $_} @{$opts{ignore} || []};
 
   return bless {
     ignore => \@ignore,
