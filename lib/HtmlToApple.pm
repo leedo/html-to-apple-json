@@ -27,9 +27,9 @@ sub new {
   my @ignore = map {selector_to_xpath $_} @{$opts{ignore} || []};
 
   return bless {
-    ignore => \@ignore,
-    types => \@types,
-    tag => HtmlToApple::Tag->new({name => "body"}),
+    ignore    => \@ignore,
+    types     => \@types,
+    tag       => HtmlToApple::Tag->new({name => "body"}),
     component => HtmlToApple::Component::Empty->new,
   }, $class;
 }
