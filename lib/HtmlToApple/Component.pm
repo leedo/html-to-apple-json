@@ -3,7 +3,7 @@ package HtmlToApple::Component;
 use Moo;
 use List::Util qw{any};
 
-extends "Tree::DAG_Node::XPath";
+extends "Tree::DAG_Node";
 
 sub type {
   my ($self) = @_;
