@@ -63,7 +63,7 @@ sub parse {
 sub eof {
   my ($self) = @_;
   $self->parser->eof;
-  $self->{tag}->root->delete_tree;
+  $self->tag->root->delete_tree;
   delete $self->{tag};
 }
 
@@ -76,7 +76,7 @@ sub start_tag {
   my ($self, $name, $attr, $raw) = @_;
 
   # create new tag as a child of current tag
-  my $tag = $self->{tag} = $self->{tag}->append($name, $attr, $raw);
+  my $tag = $self->{tag} = $self->tag->append($name, $attr, $raw);
 
   if (!$self->inside_ignore) {
     if (my $type = $self->matches_type($tag)) {
