@@ -9,7 +9,9 @@ use Exporter qw{import};
 sub test_file {
   my ($file, $tests, $cb) = @_;
 
-  my $h = HtmlToApple->new;
+  my %config = do "config.pl";
+
+  my $h = HtmlToApple->new(%config);
   open(my $fh, "<:utf8", "t/$file") || die;
 
   $h->parse($_) while (<$fh>);

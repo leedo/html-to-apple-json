@@ -19,31 +19,21 @@ use HtmlToApple::Component::Caption;
 use HtmlToApple::Component::Gallery;
 use HtmlToApple::Component::GalleryImage;
 
-# ignore anything that matches or falls under these
-our @IGNORE = ('aside', 'script', 'style', 'div.gallery-main-image');
-
-# if we hit one of these CSS selectors, and the current component
-# accepts the new type: we create a new component, append
-# it to the current component, make make it the new current component
-our @TYPES = (
-  [Heading      => 'h1, h2, h3, h4'],
-  [Pullquote    => 'blockquote.pullquote'],
-  [Tweet        => 'blockquote.twitter-tweet'],
-  [Image        => 'figure.image img'],
-  [Video        => 'figure.video'],
-  [Caption      => 'figure figcaption, div.gallery-thumb-copy p'],
-  [Gallery      => 'ol.gallery-thumbs'],
-  [GalleryImage => 'ol.gallery-thumbs a[data-orig]'],
-  [Body         => 'p, ol, ul, blockquote'],
-);
-
-# convert CSS selectors to XPath ahead of time
-@IGNORE = map {selector_to_xpath($_)} @IGNORE;
-$_->[1] = selector_to_xpath($_->[1]) for @TYPES;
-
 sub new {
-  my ($class) = @_;
+  my ($class, %opts) = @_;
+
+  # convert CSS selectors to XPath selectors
+  my @types = map {
+    [$_->[0], selector_to_xpath($_->[1])]
+  } defined $opts{types} ? @{$opts{types}} : ();
+
+  my @ignore = map {
+    selector_to_xpath($_)
+  } defined $opts{ignore} ? @{$opts{ignore}} : ();
+
   return bless {
+    ignore => \@ignore,
+    types => \@types,
     tag => HtmlToApple::Tag->new({name => "body"}),
     component => HtmlToApple::Component::Empty->new,
   }, $class;
@@ -109,14 +99,14 @@ sub start_tag {
 
 sub matches_type {
   my ($self, $tag) = @_;
-  for my $type (@TYPES) {
+  for my $type (@{$self->{types}}) {
     return $type->[0] if $tag->matches($type->[1]);
   }
 }
 
 sub inside_ignore {
   my ($self) = @_;
-  for my $ignore (@IGNORE) {
+  for my $ignore (@{$self->{ignore}}) {
     return 1 if $self->tag->matches_up($ignore);
   }
 }

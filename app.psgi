@@ -8,6 +8,7 @@ use Digest::SHA1 qw{sha1_hex};
 use JSON;
 
 my $template = Text::Xslate->new(path => "share/templates");
+my %config = do "config.pl";
 
 builder {
   mount "/" => sub {
@@ -16,7 +17,7 @@ builder {
     my $redis = Redis->new;
 
     if ($req->method eq "POST") {
-      my $h = HtmlToApple->new;
+      my $h = HtmlToApple->new(%config);
       $h->parse(decode utf8 => $req->parameters->{content});
       $h->eof;
       my $json = JSON->new->pretty->encode($h->dump);
@@ -37,7 +38,7 @@ builder {
       if (!$content) {
         $content = do {
           local $/;
-          open my $fh, "<:utf8", "t/etsy.html";
+          open my $fh, "<:utf8", "t/data/etsy.html";
           <$fh>;
         };
       }
