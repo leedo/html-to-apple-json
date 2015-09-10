@@ -18,11 +18,12 @@ builder {
 
     if ($req->method eq "POST") {
       my $h = HtmlToApple->new(%config);
-      $h->parse(decode utf8 => $req->parameters->{content});
+      my $content = $req->parameters->{content} || $req->content;
+      $h->parse(decode utf8 => $content);
       $h->eof;
       my $json = JSON->new->pretty->encode($h->dump);
-      my $hash = sha1_hex($req->parameters->{content});
-      $redis->set("apple-json-$hash", $req->parameters->{content});
+      my $hash = sha1_hex($content);
+      $redis->set("apple-json-$hash", $content);
       my $res = encode_json({hash => $hash, data => $json});
 
       return [200, ["Content-Type", "application/json; charset=utf-8"], [$res]];
