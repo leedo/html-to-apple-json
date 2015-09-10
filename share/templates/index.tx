@@ -29,6 +29,7 @@
       <textarea id="output"></textarea>
     </div>
     <div class="bot">
+      <input type="text" id="url" value="" placeholder="URL">
       <input type="submit" id="submit" value="Update JSON output">
       <p><a href="https://github.com/leedo/html-to-apple-json">html-to-apple-json</a></p>
     </div>
@@ -37,9 +38,16 @@
   <script type="text/javascript">
     $(document).ready(function() {
       function update_json() {
+        var data = {};
+        if ($('#url').val()) {
+          data['url'] = $('#url').val();
+        }
+        else {
+          data['content'] = $('#content').val();
+        }
         $.ajax({
           type: "POST",
-          data: {content: $("#content").val()},
+          data: data,
           dataType: "json",
           success: function(res) {
             $('#output').val(res.data);

@@ -1,4 +1,5 @@
 (
+  start => 'article.standalone',
   types => [
     [Title        => 'h1.heading'],
     [Heading      => 'h2, h3, h4'],
