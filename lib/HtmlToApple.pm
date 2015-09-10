@@ -11,6 +11,7 @@ use HTML::Selector::XPath qw{selector_to_xpath};
 use HtmlToApple::Component::Empty;
 use HtmlToApple::Component::Body;
 use HtmlToApple::Component::Heading;
+use HtmlToApple::Component::Byline;
 use HtmlToApple::Component::Title;
 use HtmlToApple::Component::Pullquote;
 use HtmlToApple::Component::Tweet;

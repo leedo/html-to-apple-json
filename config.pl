@@ -3,6 +3,7 @@
   types => [
     [Title        => 'h1.heading'],
     [Heading      => 'h2, h3, h4'],
+    [Byline       => 'p.byline'],
     [Pullquote    => 'blockquote.pullquote'],
     [Tweet        => 'blockquote.twitter-tweet'],
     [Image        => 'figure.image img'],
@@ -17,5 +18,7 @@
     'script',
     'style',
     'div.gallery-main-image',
+    '#article-footer-wrap',
+    '#corner-info',
   ]
 );

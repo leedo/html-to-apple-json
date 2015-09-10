@@ -10,7 +10,7 @@ extends "HtmlToApple::Component";
 
 has html => (is => "ro", default => sub {[]});
 
-sub allowed_tags { () }
+sub allowed_tags {  }
 
 sub start_tag {
   my ($self, $tag, $raw) = @_;
@@ -36,7 +36,7 @@ sub allowed_tag {
     return 1;
   }
 
-  return !$self->allowed_tags;
+  return 0;
 }
 
 sub add_text {
