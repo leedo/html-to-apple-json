@@ -1,6 +1,7 @@
 (
   types => [
-    [Heading      => 'h1, h2, h3, h4'],
+    [Title        => 'h1.heading'],
+    [Heading      => 'h2, h3, h4'],
     [Pullquote    => 'blockquote.pullquote'],
     [Tweet        => 'blockquote.twitter-tweet'],
     [Image        => 'figure.image img'],

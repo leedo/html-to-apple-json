@@ -76,7 +76,7 @@ sub start_tag {
   if (!$self->inside_ignore) {
     if (my $type = $self->matches_type($tag)) {
       if ($self->component->accepts($type)) {
-        my $component = $self->component->append($type, $attr);
+        my $component = $self->component->append($type, {%$attr, tagname => $name});
         $tag->attributes->{component} = $component;
         $self->{component} = $component;
       }
