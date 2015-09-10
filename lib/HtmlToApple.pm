@@ -24,11 +24,9 @@ use HtmlToApple::Component::GalleryImage;
 sub new {
   my ($class, %opts) = @_;
 
-  my $root = selector_to_xpath( $opts{start}) . "/";
-
   # convert CSS selectors to XPath selectors
-  my @types  = map {[$_->[0], selector_to_xpath($_->[1], root => $root)]} @{$opts{types} || []};
-  my @ignore = map {selector_to_xpath($_, root => $root)} @{$opts{ignore} || []};
+  my @types  = map {[$_->[0], selector_to_xpath $_->[1]]} @{$opts{types} || []};
+  my @ignore = map {selector_to_xpath $_} @{$opts{ignore} || []};
 
   warn join "\n", @ignore;
   return bless {

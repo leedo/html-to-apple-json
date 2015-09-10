@@ -78,7 +78,7 @@ sub as_data {
   my ($self) = @_;
   return {
     format => "markdown",
-    text => $self->as_markdown,
+    text => join("", @{$self->html}),
     role => $self->role,
   };
 }
