@@ -22,7 +22,7 @@ sub images {
 sub as_data {
   my ($self) = @_;
   return {
-    type => $self->name,
+    role => "gallery",
     images => [map {$_->as_data} $self->images],
   }
 }

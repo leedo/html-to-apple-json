@@ -13,7 +13,7 @@ sub caption {
 sub as_data {
   my ($self) = @_;
   return {
-    type => $self->name,
+    role => "image",
     src => $self->attributes->{"data-orig"},
     width => $self->attributes->{"data-width"},
     height => $self->attributes->{"data-height"},

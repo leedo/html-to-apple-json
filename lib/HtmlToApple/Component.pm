@@ -30,7 +30,7 @@ sub end_tag { }
 
 sub as_data {
   my $self = shift;
-  return {type => $self->type};
+  return {role => $self->type};
 }
 
 

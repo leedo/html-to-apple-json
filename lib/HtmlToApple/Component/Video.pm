@@ -11,7 +11,7 @@ sub as_data {
   my ($self) = @_;
   return {
     caption => $self->caption,
-    type => $self->type,
+    role => "video",
   }
 }
 

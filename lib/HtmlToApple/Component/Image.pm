@@ -11,9 +11,9 @@ sub as_data {
   return {
     width => $self->attributes->{width},
     height => $self->attributes->{height},
-    src => $self->attributes->{src},
+    url => $self->attributes->{src},
     caption => $self->caption,
-    type => $self->type,
+    role => "photo"
   }
 }
 

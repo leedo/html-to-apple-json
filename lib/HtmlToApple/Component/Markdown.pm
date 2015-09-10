@@ -79,7 +79,7 @@ sub as_data {
   return {
     format => "markdown",
     text => $self->as_markdown,
-    type => $self->type,
+    role => $self->role,
   };
 }
 
